@@ -11,7 +11,7 @@ function UserProcessTest() {
 
     // --- 1. 백엔드로 보낼 데이터 준비 ---
     const userData = {
-      userId: 'user123',
+      test: '안녕하세요',
       userName: 'TestUser'
     };
 

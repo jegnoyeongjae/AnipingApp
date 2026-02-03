@@ -15,17 +15,39 @@ import "./HomePage.css";
 const HomePage = () => {
   const [items, setItems] = useState([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get('/data/animeData.json');
-        setItems(response.data);
-      } catch (error) {
-        console.error("Error fetching anime data:", error);
-      }
+
+    const userData = {
+      test: '안녕하세요',
+      userName: '안녕로봇'
     };
-    fetchData();
-  }, []);
+
+
+ useEffect(() => {
+   const fetchData = async () => {
+     try {
+       const response = await fetch('/api/anipang', {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json',
+         },
+         body: JSON.stringify(userData),
+       });
+
+       if (!response.ok) {
+         throw new Error('네트워크 응답이 좋지 않습니다.');
+       }
+
+       const result = await response.json();
+       console.log("성공:", result);
+
+     } catch (error) {
+       // try를 썼다면 반드시 catch로 에러를 잡아줘야 합니다.
+       console.error("데이터 전송 중 에러 발생:", error);
+     }
+   };
+
+   fetchData();
+ }, [userData]); // userData가 변경될 때마다 실행되도록 의존성 배열에 추가
 
   const renderCategory = (category, title, icon) => (
     <section className="my-32 px-6 md:px-12 relative">
