@@ -87,7 +87,7 @@ const HomePage = () => {
                 <Link to={`/detail/${item.id}`}>
                   <div className="relative aspect-[3/4.2] overflow-hidden">
                     <img 
-                      src={item.img} 
+                      src={item.img}
                       alt={item.title} 
                       className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
                     />

@@ -2,6 +2,7 @@ import { Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Paging } from "../../components/common/Paging";
 import { Star } from "lucide-react";
+import axios from "axios";
 
 const AniList = () => {
   const { category } = useParams();
@@ -21,14 +22,12 @@ const AniList = () => {
   };
 
   useEffect(() => {
-    fetch("/data/animeData.json")
-      .then((res) => res.json())
-      .then((data) => {
-        const categoryItems = data.filter((item) => item.category === category);
-        setAllItems(categoryItems);
-        setFilteredItems(categoryItems);
+    axios.get(`http://localhost:8080/api/anime?category=${category}`)
+      .then((res) => {
+        setAllItems(res.data);
+        setFilteredItems(res.data);
       })
-      .catch((err) => console.error("JSON 불러오기 실패:", err));
+      .catch((err) => console.error("애니 목록 조회실패:", err));
   }, [category]);
 
   useEffect(() => {
@@ -83,7 +82,7 @@ const AniList = () => {
               <Link to={`/detail/${item.id}`}>
                 <div className="relative aspect-[3/4.2] overflow-hidden">
                   <img 
-                    src={item.img} 
+                    src={item.imgUrl}
                     alt={item.title} 
                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
                   />
