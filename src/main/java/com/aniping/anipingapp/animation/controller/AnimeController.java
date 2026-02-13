@@ -19,9 +19,11 @@ public class AnimeController {
     //애니 목록 조회
     @GetMapping
     public List<AniList> getAnimeList(
-            @RequestParam(required = false) String category
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String order,
+            @RequestParam(required = false) Integer limit
     ) {
-        return animeService.getAnimeList(category);
+        return animeService.getAnimeList(category, order);
     }
 
     //애니 상세 조회

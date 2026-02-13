@@ -12,44 +12,74 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "./HomePage.css";
 
+// const HomePage = () => {
+//   const [items, setItems] = useState([]);
+//
+//
+//     const userData = {
+//       test: '안녕하세요',
+//       userName: '안녕로봇'
+//     };
+//
+//
+//  useEffect(() => {
+//    const fetchData = async () => {
+//      try {
+//        const response = await fetch('/api/anipang', {
+//          method: 'POST',
+//          headers: {
+//            'Content-Type': 'application/json',
+//          },
+//          body: JSON.stringify(userData),
+//        });
+//
+//        if (!response.ok) {
+//          throw new Error('네트워크 응답이 좋지 않습니다.');
+//        }
+//
+//        const result = await response.json();
+//        console.log("성공:", result);
+//
+//      } catch (error) {
+//        // try를 썼다면 반드시 catch로 에러를 잡아줘야 합니다.
+//        console.error("데이터 전송 중 에러 발생:", error);
+//      }
+//    };
+//
+//    fetchData();
+//  }, [userData]); // userData가 변경될 때마다 실행되도록 의존성 배열에 추가
 const HomePage = () => {
-  const [items, setItems] = useState([]);
+  // State 선언 추가!
+  const [fantasyItems, setFantasyItems] = useState([]);
+  const [romanceItems, setRomanceItems] = useState([]);
+  const [mysteryItems, setMysteryItems] = useState([]);
+  const [sfItems, setSfItems] = useState([]);
+  const [normalItems, setNormalItems] = useState([]);
 
 
-    const userData = {
-      test: '안녕하세요',
-      userName: '안녕로봇'
-    };
+useEffect(()=> {
+    const fetchCategoryData = async (category, setter) => {
+        try {
+            const response = await axios.get(
+                `http://localhost:8080/api/anime?category=${category}&order=likes&limit=10`
+                );
+                setter(response.data);
+            }   catch(error) {
+                console.error(`${category}데이터 조회 실패:`, error);
+            }
+        };
+
+        fetchCategoryData('fantasy', setFantasyItems);
+        fetchCategoryData('romance', setRomanceItems);
+        fetchCategoryData('sf', setSfItems);
+        fetchCategoryData('mystery', setMysteryItems);
+        fetchCategoryData('normal', setNormalItems);
+    }, []);
 
 
- useEffect(() => {
-   const fetchData = async () => {
-     try {
-       const response = await fetch('/api/anipang', {
-         method: 'POST',
-         headers: {
-           'Content-Type': 'application/json',
-         },
-         body: JSON.stringify(userData),
-       });
 
-       if (!response.ok) {
-         throw new Error('네트워크 응답이 좋지 않습니다.');
-       }
 
-       const result = await response.json();
-       console.log("성공:", result);
-
-     } catch (error) {
-       // try를 썼다면 반드시 catch로 에러를 잡아줘야 합니다.
-       console.error("데이터 전송 중 에러 발생:", error);
-     }
-   };
-
-   fetchData();
- }, [userData]); // userData가 변경될 때마다 실행되도록 의존성 배열에 추가
-
-  const renderCategory = (category, title, icon) => (
+  const renderCategory = (items, category, title, icon) => (
     <section className="my-32 px-6 md:px-12 relative">
       <div className="flex items-center justify-between mb-12">
         <div className="flex items-center gap-4">
@@ -79,18 +109,26 @@ const HomePage = () => {
         className="pb-12"
       >
         {items
-          .filter((item) => item.category === category)
           .slice(0, 10)
-          .map((item) => (
+          .map((item, index) => (
             <SwiperSlide key={item.id}>
               <div className="anime-card rounded-[2rem] overflow-hidden border border-blue-50/50 group">
                 <Link to={`/detail/${item.id}`}>
                   <div className="relative aspect-[3/4.2] overflow-hidden">
                     <img 
-                      src={item.img}
+                      src={item.imgUrl}
                       alt={item.title} 
                       className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
                     />
+                    {/* 순위 배지 추가 */}
+                      <div className="absolute top-4 right-4 bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center font-black text-sm shadow-lg">
+                        {index + 1}
+                      </div>
+                    {/* 좋아요 표시 */}
+                      <div className="absolute top-4 left-4 glass-panel px-3 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-black text-primary shadow-sm">
+                        <Star size={12} fill="currentColor" />
+                        {item.likes}
+                      </div>
                     <div className="absolute top-4 left-4 glass-panel px-3 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-black text-primary shadow-sm">
                       <Star size={12} fill="currentColor" />
                       {/* Mock score, as it's not in the new data */}
@@ -172,11 +210,11 @@ const HomePage = () => {
         </section>
 
         <div className="max-w-[1440px] mx-auto">
-          {renderCategory("fantasy", "Epic Fantasy", <Sparkles className="text-purple-400 fill-purple-400" size={20} />)}
-          {renderCategory("romance", "Youthful Romance", <Zap className="text-pink-400 fill-pink-400" size={20} />)}
-          {renderCategory("mystery", "Crime & Mystery", <Wind className="text-teal-400" size={20} />)}
-          {renderCategory("sf", "Sci-Fi & Future", <Zap className="text-cyan-400 fill-cyan-400" size={20} />)}
-          {renderCategory("normal", "Slice of Life", <Sparkles className="text-orange-400 fill-orange-400" size={20} />)}
+          {renderCategory(fantasyItems, "fantasy", "Epic Fantasy", <Sparkles className="text-purple-400 fill-purple-400" size={20} />)}
+          {renderCategory(romanceItems, "romance", "Youthful Romance", <Zap className="text-pink-400 fill-pink-400" size={20} />)}
+          {renderCategory(mysteryItems, "mystery", "Crime & Mystery", <Wind className="text-teal-400" size={20} />)}
+          {renderCategory(sfItems, "sf", "Sci-Fi & Future", <Zap className="text-cyan-400 fill-cyan-400" size={20} />)}
+          {renderCategory(normalItems, "normal", "Slice of Life", <Sparkles className="text-orange-400 fill-orange-400" size={20} />)}
 
           {/* Ad Section Re-imagined */}
           <section className="my-32 px-6 md:px-12">

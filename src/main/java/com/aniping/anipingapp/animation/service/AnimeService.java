@@ -9,7 +9,7 @@ import java.util.List;
 public interface AnimeService {
 
     //애니목록 조회(카테고리 필터 기능)
-    List<AniList> getAnimeList(String category);
+    List<AniList> getAnimeList(String category, String order, Integer limit);
 
     //애니 상세 조회
     Anime getAnime(Long id);

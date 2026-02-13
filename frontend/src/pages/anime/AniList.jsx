@@ -22,21 +22,19 @@ const AniList = () => {
   };
 
   useEffect(() => {
-    axios.get(`http://localhost:8080/api/anime?category=${category}`)
+    const orderParam = sortType === "popular" ? "likes" : "";
+    axios.get(`http://localhost:8080/api/anime?category=${category}&order=${orderParam}`)
       .then((res) => {
         setAllItems(res.data);
         setFilteredItems(res.data);
       })
       .catch((err) => console.error("애니 목록 조회실패:", err));
-  }, [category]);
+  }, [category, sortType]);
 
   useEffect(() => {
     let sorted = [...allItems];
     if (sortType === "latest") {
-      sorted.sort((a, b) => b.id - a.id);
-    } else if (sortType === "popular") {
-      // 'score'가 없으므로 임의의 인기도(likes)를 만들어 정렬하거나, id 역순으로 정렬
-      sorted.sort((a, b) => a.id - b.id); 
+      sorted.sort((a, b) => new Date(b.airdate) - new Date(a.airdate));
     }
     setFilteredItems(sorted);
     setCurrentPage(1); // 정렬 변경 시 1페이지로
