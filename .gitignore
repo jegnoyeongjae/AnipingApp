@@ -70,9 +70,18 @@ dist-ssr
 *.sw?
 
 
-#Docker
+# Docker
 *.env
+<<<<<<< HEAD
 # Database
 db/*.sql
 db/data/
 !db/init.sql
+=======
+
+# Database
+db/*.sql
+db/data/
+!db/init.sql 
+# init.sql은 초기 스키마 공유용으로 필요하다면 주석 해제하여 사용 (데이터 제외)
+>>>>>>> 0f44f31b5e2ec33624bd9044301ca7542878d018
