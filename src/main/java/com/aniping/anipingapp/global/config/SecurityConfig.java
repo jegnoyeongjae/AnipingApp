@@ -40,7 +40,6 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
 
                 .authorizeHttpRequests(auth -> auth
-<<<<<<< HEAD
                         .requestMatchers("/api/user/login", "/api/user/join", "/api/process-user", "/api/user/check-id", "/api/user/check-nickname", "/api/anime/**").permitAll()
 
                         // 내 정보 조회는 인증된 사용자 누구나 가능 (USER, ADMIN 모두)
@@ -66,30 +65,6 @@ public class SecurityConfig {
                                 "/api/AdminAniLiEd/**",
                                 "/api/user/**",
                                 "/api/anime/**"
-=======
-                        .requestMatchers(
-                                "/", 
-                                "/index.html", 
-                                "/assets/**", 
-                                "/images/**",
-                                "/data/**",
-                                "/favicon.ico",
-                                "/api/user/login", 
-                                "/api/user/join", 
-                                "/api/user/check-id", 
-                                "/api/user/check-nickname",
-                                "/api/files/image/**",
-                                "/api/oauth/join" // 소셜 회원가입 API 허용
-                        ).permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated()
-                )
-                
-                // OAuth2 로그인 설정
-                .oauth2Login(oauth2 -> oauth2
-                        .userInfoEndpoint(userInfo -> userInfo
-                                .userService(customOAuth2UserService)
->>>>>>> 0f44f31b5e2ec33624bd9044301ca7542878d018
                         )
                         .successHandler(oAuth2SuccessHandler)
                 )
