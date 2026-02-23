@@ -38,7 +38,7 @@ public class Anime {
     private String category;
 
     //방영 시작일
-    private LocalDate airdate;
+    private LocalDate date;
 
     // 시청 연령 등급
     @Enumerated(EnumType.STRING)

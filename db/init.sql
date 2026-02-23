@@ -31,22 +31,22 @@ DROP TABLE IF EXISTS `anilist`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `anilist` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `title` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `director` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `studio` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `date` date DEFAULT NULL,
-  `grade` enum('all','12','15','19') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `aniPv` text COLLATE utf8mb4_unicode_ci,
-  `viewCount` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT (0),
-  `likes` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT (0),
-  `cateId` int DEFAULT NULL,
-  `createAt` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updateAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  `deleteAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `title` (`title`)
+                           `id` int NOT NULL AUTO_INCREMENT,
+                           `title` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                           `director` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                           `studio` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                           `description` text COLLATE utf8mb4_unicode_ci,
+                           `date` date DEFAULT NULL,
+                           `grade` enum('all','12','15','19') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                           `aniPv` text COLLATE utf8mb4_unicode_ci,
+                           `viewCount` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT (0),
+                           `likes` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT (0),
+                           `cateId` int DEFAULT NULL,
+                           `createAt` datetime DEFAULT CURRENT_TIMESTAMP,
+                           `updateAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+                           `deleteAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+                           PRIMARY KEY (`id`),
+                           UNIQUE KEY `title` (`title`)
 ) ENGINE=InnoDB AUTO_INCREMENT=40086 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -68,23 +68,23 @@ DROP TABLE IF EXISTS `ask`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `ask` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `title` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `userId` bigint DEFAULT NULL,
-  `status` tinyint(1) DEFAULT '0',
-  `content` text COLLATE utf8mb4_unicode_ci,
-  `ansTitle` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `ansContent` text COLLATE utf8mb4_unicode_ci,
-  `adminId` bigint DEFAULT NULL,
-  `replyAt` datetime DEFAULT NULL,
-  `createAt` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updateAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  `deleteAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `FKsmgkf77ksabsmqnks6m2aw7bo` (`adminId`),
-  KEY `FKqtevpt3vcdc4f8vvjff2p3gig` (`userId`),
-  CONSTRAINT `FKqtevpt3vcdc4f8vvjff2p3gig` FOREIGN KEY (`userId`) REFERENCES `users` (`id`),
-  CONSTRAINT `FKsmgkf77ksabsmqnks6m2aw7bo` FOREIGN KEY (`adminId`) REFERENCES `users` (`id`)
+                       `id` int NOT NULL AUTO_INCREMENT,
+                       `title` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                       `userId` bigint DEFAULT NULL,
+                       `status` tinyint(1) DEFAULT '0',
+                       `content` text COLLATE utf8mb4_unicode_ci,
+                       `ansTitle` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                       `ansContent` text COLLATE utf8mb4_unicode_ci,
+                       `adminId` bigint DEFAULT NULL,
+                       `replyAt` datetime DEFAULT NULL,
+                       `createAt` datetime DEFAULT CURRENT_TIMESTAMP,
+                       `updateAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+                       `deleteAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+                       PRIMARY KEY (`id`),
+                       KEY `FKsmgkf77ksabsmqnks6m2aw7bo` (`adminId`),
+                       KEY `FKqtevpt3vcdc4f8vvjff2p3gig` (`userId`),
+                       CONSTRAINT `FKqtevpt3vcdc4f8vvjff2p3gig` FOREIGN KEY (`userId`) REFERENCES `users` (`id`),
+                       CONSTRAINT `FKsmgkf77ksabsmqnks6m2aw7bo` FOREIGN KEY (`adminId`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -105,14 +105,14 @@ DROP TABLE IF EXISTS `category`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `category` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `slug` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `sequence` int DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`),
-  UNIQUE KEY `slug` (`slug`),
-  UNIQUE KEY `sequence` (`sequence`)
+                            `id` int NOT NULL AUTO_INCREMENT,
+                            `name` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                            `slug` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                            `sequence` int DEFAULT NULL,
+                            PRIMARY KEY (`id`),
+                            UNIQUE KEY `name` (`name`),
+                            UNIQUE KEY `slug` (`slug`),
+                            UNIQUE KEY `sequence` (`sequence`)
 ) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -134,17 +134,17 @@ DROP TABLE IF EXISTS `characters`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `characters` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `aniId` int DEFAULT NULL,
-  `cvId` int DEFAULT NULL,
-  `name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `voteCount` int DEFAULT '0',
-  `active` enum('waiting','accept','reject') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `userId` int DEFAULT NULL,
-  `createAt` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updateAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  `deleteAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+                              `id` int NOT NULL AUTO_INCREMENT,
+                              `aniId` int DEFAULT NULL,
+                              `cvId` int DEFAULT NULL,
+                              `name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                              `voteCount` int DEFAULT '0',
+                              `active` enum('waiting','accept','reject') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                              `userId` int DEFAULT NULL,
+                              `createAt` datetime DEFAULT CURRENT_TIMESTAMP,
+                              `updateAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+                              `deleteAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+                              PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=646 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -166,15 +166,15 @@ DROP TABLE IF EXISTS `comments`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `comments` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `userId` int DEFAULT NULL,
-  `boardType` enum('FREE','ANI') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `targetId` int DEFAULT NULL,
-  `content` text COLLATE utf8mb4_unicode_ci,
-  `createAt` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updateAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  `deleteAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+                            `id` int NOT NULL AUTO_INCREMENT,
+                            `userId` int DEFAULT NULL,
+                            `boardType` enum('FREE','ANI') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                            `targetId` int DEFAULT NULL,
+                            `content` text COLLATE utf8mb4_unicode_ci,
+                            `createAt` datetime DEFAULT CURRENT_TIMESTAMP,
+                            `updateAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+                            `deleteAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+                            PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -195,16 +195,16 @@ DROP TABLE IF EXISTS `famousline`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `famousline` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `charId` int DEFAULT NULL,
-  `content` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `likes` int DEFAULT '0',
-  `active` enum('waiting','accept','reject') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `userId` int DEFAULT NULL,
-  `createAt` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updateAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  `deleteAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+                              `id` int NOT NULL AUTO_INCREMENT,
+                              `charId` int DEFAULT NULL,
+                              `content` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                              `likes` int DEFAULT '0',
+                              `active` enum('waiting','accept','reject') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                              `userId` int DEFAULT NULL,
+                              `createAt` datetime DEFAULT CURRENT_TIMESTAMP,
+                              `updateAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+                              `deleteAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+                              PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -226,14 +226,14 @@ DROP TABLE IF EXISTS `faq`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `faq` (
-  `faqId` int NOT NULL AUTO_INCREMENT,
-  `question` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `answer` text COLLATE utf8mb4_unicode_ci,
-  `createAt` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updateAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  `deleteAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  `regDate` datetime(6) DEFAULT NULL,
-  PRIMARY KEY (`faqId`)
+                       `faqId` int NOT NULL AUTO_INCREMENT,
+                       `question` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                       `answer` text COLLATE utf8mb4_unicode_ci,
+                       `createAt` datetime DEFAULT CURRENT_TIMESTAMP,
+                       `updateAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+                       `deleteAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+                       `regDate` datetime(6) DEFAULT NULL,
+                       PRIMARY KEY (`faqId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -254,17 +254,17 @@ DROP TABLE IF EXISTS `files`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `files` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `targetType` enum('PROFILE','BANNER','BOARD','ASK','CHARACTER','LINE','BTN','ACTOR','MAINSLIDE') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `targetId` int DEFAULT NULL,
-  `s3Key` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `originalName` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `status` enum('ACTIVE','DELETED') COLLATE utf8mb4_unicode_ci DEFAULT 'ACTIVE',
-  `depth` int DEFAULT '0',
-  `createAt` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updateAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  `deleteAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+                         `id` int NOT NULL AUTO_INCREMENT,
+                         `targetType` enum('PROFILE','BANNER','BOARD','ASK','CHARACTER','LINE','BTN','ACTOR','MAINSLIDE') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                         `targetId` int DEFAULT NULL,
+                         `s3Key` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                         `originalName` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                         `status` enum('ACTIVE','DELETED') COLLATE utf8mb4_unicode_ci DEFAULT 'ACTIVE',
+                         `depth` int DEFAULT '0',
+                         `createAt` datetime DEFAULT CURRENT_TIMESTAMP,
+                         `updateAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+                         `deleteAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+                         PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=349 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -286,16 +286,16 @@ DROP TABLE IF EXISTS `freeboard`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `freeboard` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `userId` int DEFAULT NULL,
-  `title` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `content` text COLLATE utf8mb4_unicode_ci,
-  `views` int DEFAULT '0',
-  `likes` int DEFAULT '0',
-  `createAt` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updateAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  `deleteAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+                             `id` int NOT NULL AUTO_INCREMENT,
+                             `userId` int DEFAULT NULL,
+                             `title` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                             `content` text COLLATE utf8mb4_unicode_ci,
+                             `views` int DEFAULT '0',
+                             `likes` int DEFAULT '0',
+                             `createAt` datetime DEFAULT CURRENT_TIMESTAMP,
+                             `updateAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+                             `deleteAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+                             PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -317,10 +317,10 @@ DROP TABLE IF EXISTS `tags`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `tags` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`)
+                        `id` int NOT NULL AUTO_INCREMENT,
+                        `name` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                        PRIMARY KEY (`id`),
+                        UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -341,26 +341,26 @@ DROP TABLE IF EXISTS `users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
-  `age` int DEFAULT NULL,
-  `createAt` datetime(6) DEFAULT NULL,
-  `deleteAt` datetime(6) DEFAULT NULL,
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `updateAt` datetime(6) DEFAULT NULL,
-  `phoneNumber` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `loginId` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `nickname` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `best_ani` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `grade` enum('USER','ADMIN') COLLATE utf8mb4_unicode_ci DEFAULT 'USER',
-  `profileImg` tinytext COLLATE utf8mb4_unicode_ci,
-  `social` enum('LOCAL','GOOGLE','KAKAO') COLLATE utf8mb4_unicode_ci DEFAULT 'LOCAL',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `UK_k5xlwfhmgi7dvnvcd34tnlruw` (`loginId`),
-  UNIQUE KEY `UK_2ty1xmrrgtn89xt7kyxx6ta7h` (`nickname`),
-  UNIQUE KEY `UK_6dotkott2kjsp8vw4d0m25fb7` (`email`),
-  UNIQUE KEY `UK_kwds03ohobcd8p6eowkw0f5bm` (`phoneNumber`)
+                         `age` int DEFAULT NULL,
+                         `createAt` datetime(6) DEFAULT NULL,
+                         `deleteAt` datetime(6) DEFAULT NULL,
+                         `id` bigint NOT NULL AUTO_INCREMENT,
+                         `updateAt` datetime(6) DEFAULT NULL,
+                         `phoneNumber` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                         `loginId` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+                         `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+                         `nickname` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+                         `email` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+                         `best_ani` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                         `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+                         `grade` enum('USER','ADMIN') COLLATE utf8mb4_unicode_ci DEFAULT 'USER',
+                         `profileImg` tinytext COLLATE utf8mb4_unicode_ci,
+                         `social` enum('LOCAL','GOOGLE','KAKAO') COLLATE utf8mb4_unicode_ci DEFAULT 'LOCAL',
+                         PRIMARY KEY (`id`),
+                         UNIQUE KEY `UK_k5xlwfhmgi7dvnvcd34tnlruw` (`loginId`),
+                         UNIQUE KEY `UK_2ty1xmrrgtn89xt7kyxx6ta7h` (`nickname`),
+                         UNIQUE KEY `UK_6dotkott2kjsp8vw4d0m25fb7` (`email`),
+                         UNIQUE KEY `UK_kwds03ohobcd8p6eowkw0f5bm` (`phoneNumber`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -382,19 +382,19 @@ DROP TABLE IF EXISTS `voiceactor`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `voiceactor` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `birth` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `height` int DEFAULT NULL,
-  `bloodType` enum('A','B','AB','O','?') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `agency` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `rank` int DEFAULT NULL,
-  `likes` int DEFAULT '0',
-  `createAt` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updateAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  `deleteAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`)
+                              `id` int NOT NULL AUTO_INCREMENT,
+                              `name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                              `birth` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                              `height` int DEFAULT NULL,
+                              `bloodType` enum('A','B','AB','O','?') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                              `agency` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                              `rank` int DEFAULT NULL,
+                              `likes` int DEFAULT '0',
+                              `createAt` datetime DEFAULT CURRENT_TIMESTAMP,
+                              `updateAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+                              `deleteAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+                              PRIMARY KEY (`id`),
+                              UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3900 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -416,13 +416,13 @@ DROP TABLE IF EXISTS `wishlist`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `wishlist` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `userId` int DEFAULT NULL,
-  `aniId` int DEFAULT NULL,
-  `createAt` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updateAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  `deleteAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+                            `id` int NOT NULL AUTO_INCREMENT,
+                            `userId` int DEFAULT NULL,
+                            `aniId` int DEFAULT NULL,
+                            `createAt` datetime DEFAULT CURRENT_TIMESTAMP,
+                            `updateAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+                            `deleteAt` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+                            PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

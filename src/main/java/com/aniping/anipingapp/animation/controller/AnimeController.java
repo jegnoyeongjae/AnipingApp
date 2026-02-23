@@ -23,7 +23,7 @@ public class AnimeController {
             @RequestParam(required = false) String order,
             @RequestParam(required = false) Integer limit
     ) {
-        return animeService.getAnimeList(category, order);
+        return animeService.getAnimeList(category, order, limit);
     }
 
     //애니 상세 조회

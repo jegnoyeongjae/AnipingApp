@@ -33,10 +33,6 @@ public class AniList {
     @Column(length = 100)
     private String studio;
 
-    //방영 시작일
-    @Column
-    private LocalDate airdate;
-
     //방영날짜
     @Column
     private  LocalDate date;
