@@ -1,13 +1,9 @@
-package com.aniping.anipingapp.animation.entity;
+package com.aniping.anipingapp.animation.legacy;
 
+import com.aniping.anipingapp.animation.entity.Anilist;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 
-@Entity
-@Table(name = "anime_category")
-@Getter
-@Setter
+
 public class AnimeCategory {
 
 
@@ -17,7 +13,7 @@ public class AnimeCategory {
 
     @ManyToOne
     @JoinColumn(name = "anime_id", nullable = false)
-    private AniList aniList;
+    private Anilist aniList;
 
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)

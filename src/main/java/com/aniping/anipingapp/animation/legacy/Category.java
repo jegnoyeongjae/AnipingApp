@@ -1,13 +1,8 @@
-package com.aniping.anipingapp.animation.entity;
+package com.aniping.anipingapp.animation.legacy;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 
-@Entity
-@Table(name = "category")
-@Getter
-@Setter
+
 public class Category {
 
     @Id

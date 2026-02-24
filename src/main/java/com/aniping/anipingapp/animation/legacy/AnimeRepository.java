@@ -1,6 +1,5 @@
-package com.aniping.anipingapp.animation.repository;
+package com.aniping.anipingapp.animation.legacy;
 
-import com.aniping.anipingapp.animation.entity.Anime;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

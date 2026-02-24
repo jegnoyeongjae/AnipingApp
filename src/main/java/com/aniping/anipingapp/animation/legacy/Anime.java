@@ -1,16 +1,13 @@
-package com.aniping.anipingapp.animation.entity;
+package com.aniping.anipingapp.animation.legacy;
 
 
+import com.aniping.anipingapp.animation.entity.Grade;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "anime")
-@Getter
-@Setter
+
 public class Anime {
 
     @Id

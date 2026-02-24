@@ -3,7 +3,7 @@ spring:
     name: AnipingApp
   config:
     import: optional:classpath:secret.properties
-    
+
   security:
     oauth2:
       client:

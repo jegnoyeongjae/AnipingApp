@@ -40,31 +40,29 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/user/login", "/api/user/join", "/api/process-user", "/api/user/check-id", "/api/user/check-nickname", "/api/anime/**").permitAll()
-
-                        // 내 정보 조회는 인증된 사용자 누구나 가능 (USER, ADMIN 모두)
-                        .requestMatchers("/api/user/me").authenticated()
-
-                        // 💡 보안 핵심: 아래 경로는 반드시 'ADMIN' 권한이 있는 세션만 접근 가능 (보안 유지!)
+                        .requestMatchers(
+                                "/",
+                                "/index.html",
+                                "/assets/**",
+                                "/images/**",
+                                "/data/**",
+                                "/favicon.ico",
+                                "/api/user/login",
+                                "/api/user/join",
+                                "/api/user/check-id",
+                                "/api/user/check-nickname",
+                                "/api/files/image/**",
+                                "/api/oauth/join", // 소셜 회원가입 API 허용
+                                "/api/anime/**"
+                        ).permitAll()
                         .requestMatchers("/api/admin/**", "/api/AdUserLi/**", "/api/AdCuSeAsk/**", "/api/AdFAQ/**", "/api/AdminAni/**", "/api/AdminAniLiEd/**").hasRole("ADMIN")
-                        .requestMatchers("/api/user/**","/api/anime/**").hasRole("USER")
                         .anyRequest().authenticated()
                 )
 
-                // 2. CSRF 예외 처리: 로그인, 회원가입 등 인증 전 POST 요청만 예외 처리
-                .csrf(csrf -> csrf
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .ignoringRequestMatchers(
-                                "/api/user/login",
-                                "/api/user/join",
-                                "/api/process-user",
-                                "/api/AdUserLi/**",
-                                "/api/AdCuSeAsk/**",
-                                "/api/AdFAQ/**",
-                                "/api/AdminAni/**",
-                                "/api/AdminAniLiEd/**",
-                                "/api/user/**",
-                                "/api/anime/**"
+                // OAuth2 로그인 설정
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService)
                         )
                         .successHandler(oAuth2SuccessHandler)
                 )
@@ -100,7 +98,7 @@ public class SecurityConfig {
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Collections.singletonList("*"));
         configuration.setAllowCredentials(true);
-        
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
