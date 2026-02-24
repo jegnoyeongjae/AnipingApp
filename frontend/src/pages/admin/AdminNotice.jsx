@@ -82,9 +82,7 @@ const AdminNotice = () => {
     };
 
     const handleSave = () => {
-        if (!editForm.title.trim() || !editForm.content.trim()) {
-            alert('제목과 내용을 모두 입력해주세요.');
-            return;
+        if (!editForm.title.trim() || !editForm.co
         }
 
         let newNotices = [...notices];
