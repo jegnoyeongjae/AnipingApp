@@ -30,8 +30,7 @@ public class Anilist {
     private LocalDate date;
 
     // DB의 ENUM 타입과 매칭 (문자열로 저장/조회)
-    @Enumerated(EnumType.STRING)
-    private Grade grade;
+    private String grade;
 
     @Column(name = "aniPv", columnDefinition = "TEXT")
     private String aniPv;

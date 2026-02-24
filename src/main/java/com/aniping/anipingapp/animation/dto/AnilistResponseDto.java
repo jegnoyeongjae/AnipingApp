@@ -15,7 +15,7 @@ public class AnilistResponseDto {
     private String studio;
     private String description;
     private LocalDate date;
-    private Grade grade;
+    private String grade;
     private String imgUrl;
 
     public AnilistResponseDto(Anilist anilist, String s3Key) {

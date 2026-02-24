@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface FileRepository extends JpaRepository<FileEntity, Integer> {
+public interface AnimeFileRepository extends JpaRepository<FileEntity, Integer> {
 
     // 핵심 기능: 특정 애니메이션(targetId)의 '활성화된' '애니메이션 타입' 이미지만 가져오기
     Optional<FileEntity> findByTargetIdAndTargetTypeAndStatus(

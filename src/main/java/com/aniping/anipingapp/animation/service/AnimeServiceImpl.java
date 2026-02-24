@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -17,7 +16,7 @@ import java.util.stream.Stream;
 public class AnimeServiceImpl implements AnimeService {
 
     private final AniListRepository aniListRepository;
-    private final FileRepository fileRepository; // 파일 리포지토리 추가!
+    private final AnimeFileRepository animefileRepository; // 파일 리포지토리 추가!
 
     @Override
     public List<AnilistResponseDto> getAnimeList(String category, String order, Integer limit) {
@@ -60,7 +59,7 @@ public class AnimeServiceImpl implements AnimeService {
 
     // 헬퍼 메소드: 엔티티를 DTO로 바꾸면서 이미지(S3Key)를 찾아옴
     private AnilistResponseDto convertToDto(Anilist anime) {
-        String s3Key = fileRepository.findByTargetIdAndTargetTypeAndStatus(
+        String s3Key = animefileRepository.findByTargetIdAndTargetTypeAndStatus(
                 anime.getId(),
                 TargetType.ANILIST,
                 Status.ACTIVE
