@@ -28,6 +28,8 @@ bin/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+.yml
+.properties
 
 ### NetBeans ###
 /nbproject/private/
@@ -72,4 +74,9 @@ dist-ssr
 
 #Docker
 *.env
-db/init.sql
+
+# Database
+db/*.sql
+db/data/
+!db/init.sql
+

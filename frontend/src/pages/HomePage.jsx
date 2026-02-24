@@ -4,7 +4,6 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import { Star, Play, Sparkles, Wind, ArrowRight, Zap } from "lucide-react";
 import axios from "axios";
-import UserProcessTest from "../components/UserProcessTest"; // 추가
 
 // Swiper styles
 import "swiper/css";
@@ -14,19 +13,23 @@ import "./HomePage.css";
 
 const HomePage = () => {
   const [items, setItems] = useState([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get('/data/animeData.json');
-        setItems(response.data);
-      } catch (error) {
-        console.error("Error fetching anime data:", error);
-      }
-    };
-    fetchData();
-  }, []);
-
+    /*
+      useEffect(() => {
+        const fetchData = async () => {
+          try {
+            // 목 데이터는 프론트엔드 서버에서 가져오도록 별도 axios 인스턴스 사용
+            const localAxios = axios.create({
+                baseURL: 'http://localhost:5173'
+            });
+            const response = await localAxios.get('/data/animeData.json');
+            setItems(response.data);
+          } catch (error) {
+            console.error("Error fetching anime data:", error);
+          }
+        };
+        fetchData();
+      }, []);
+    */
   const renderCategory = (category, title, icon) => (
     <section className="my-32 px-6 md:px-12 relative">
       <div className="flex items-center justify-between mb-12">
@@ -100,9 +103,7 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/20">
-      
       <main className="pt-20">
-        <UserProcessTest /> {/* 추가된 테스트 컴포넌트 */}
         <section className="px-6 md:px-12 pt-10">
           <Swiper
             spaceBetween={0}
