@@ -2,8 +2,8 @@ package com.aniping.anipingapp.user.service;
 
 import com.aniping.anipingapp.board.entity.FreeBoard;
 import com.aniping.anipingapp.board.repository.FreeBoardRepository;
-import com.aniping.anipingapp.character.entity.FamousLine;
-import com.aniping.anipingapp.character.repository.FamousLineRepository;
+import com.aniping.anipingapp.character.entity.FamousLineEntity;
+import com.aniping.anipingapp.character.constant.LineStatus;
 import com.aniping.anipingapp.csCenter.entity.Ask;
 import com.aniping.anipingapp.csCenter.repository.AskRepository;
 import com.aniping.anipingapp.global.constant.TargetType;
@@ -12,6 +12,7 @@ import com.aniping.anipingapp.global.file.repository.FileRepository;
 import com.aniping.anipingapp.user.dto.*;
 import com.aniping.anipingapp.user.entity.UserEntity;
 import com.aniping.anipingapp.user.entity.Wishlist;
+import com.aniping.anipingapp.user.repository.MyFamousLineRepository;
 import com.aniping.anipingapp.user.repository.UserRepository;
 import com.aniping.anipingapp.user.repository.WishlistRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final WishlistRepository wishlistRepository;
     private final FreeBoardRepository freeBoardRepository;
-    private final FamousLineRepository famousLineRepository;
+    private final MyFamousLineRepository myFamousLineRepository; // 변경됨
     private final AskRepository askRepository;
     private final FileRepository fileRepository;
     private final PasswordEncoder passwordEncoder;
@@ -58,7 +59,6 @@ public class UserService {
         UserEntity user = userRepository.findByLoginId(userLoginDto.getLoginId())
                 .orElseThrow(() -> new BadCredentialsException("아이디 또는 비밀번호가 일치하지 않습니다."));
 
-        // 소셜 로그인 계정인지 확인
         if (user.getSocial() != UserEntity.Social.LOCAL) {
             throw new BadCredentialsException("해당 방식으로 접근할 수 없는 아이디입니다.");
         }
@@ -101,7 +101,6 @@ public class UserService {
     public boolean checkPassword(String loginId, String rawPassword) {
         return userRepository.findByLoginId(loginId)
                 .map(user -> {
-                    // 소셜 로그인 사용자는 비밀번호가 없으므로 false 반환 (또는 별도 처리)
                     if (user.getSocial() != UserEntity.Social.LOCAL) return false;
                     return passwordEncoder.matches(rawPassword, user.getPassword());
                 })
@@ -112,7 +111,7 @@ public class UserService {
     public void changePassword(String loginId, String newPassword) {
         UserEntity user = userRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-        
+
         if (user.getSocial() != UserEntity.Social.LOCAL) {
             throw new IllegalArgumentException("소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다.");
         }
@@ -207,7 +206,7 @@ public class UserService {
         UserEntity user = userRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
         
-        return famousLineRepository.findByUserIdAndDeleteAtIsNullAndActive(user.getId(), FamousLine.ActiveStatus.accept, pageable)
+        return myFamousLineRepository.findByUserIdAndDeleteAtIsNullAndActive(user.getId().intValue(), LineStatus.accept, pageable)
                 .map(line -> {
                     String imgUrl = fileRepository.findFirstByTargetTypeAndTargetIdAndStatus(
                             TargetType.LINE, 
@@ -224,11 +223,11 @@ public class UserService {
         UserEntity user = userRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
         
-        FamousLine line = famousLineRepository.findByIdAndUserIdAndDeleteAtIsNull(lineId, user.getId())
+        FamousLineEntity line = myFamousLineRepository.findByIdAndUserIdAndDeleteAtIsNull(lineId, user.getId().intValue())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 명대사이거나 본인이 작성한 글이 아닙니다."));
         
         line.setDeleteAt(LocalDateTime.now());
-        famousLineRepository.save(line);
+        myFamousLineRepository.save(line);
         
         fileRepository.findByTargetTypeAndTargetIdAndStatus(TargetType.LINE, lineId, File.FileStatus.ACTIVE)
                 .forEach(file -> {

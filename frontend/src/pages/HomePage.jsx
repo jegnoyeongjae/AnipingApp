@@ -12,6 +12,7 @@ import "swiper/css/pagination";
 import "./HomePage.css";
 
 const HomePage = () => {
+
   // State 선언 추가!
   const [fantasyItems, setFantasyItems] = useState([]);
   const [romanceItems, setRomanceItems] = useState([]);
@@ -38,9 +39,6 @@ useEffect(()=> {
         fetchCategoryData('mystery', setMysteryItems);
         fetchCategoryData('normal', setNormalItems);
     }, []);
-
-
-
 
   const renderCategory = (items, category, title, icon) => (
     <section className="my-32 px-6 md:px-12 relative">

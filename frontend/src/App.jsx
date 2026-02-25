@@ -18,13 +18,14 @@ import { AdCuSeAsk, AdFAQ } from './pages/admin/customerservice';
 import { AdminAni, AdminAniTag } from './pages/admin/AdminAni';
 import { AdminVA } from './pages/admin/AdminVoiceActor';
 import { AdminChaFL, AdminChaBoard } from './pages/admin/AdminCha';
-import { AdminVALiEd, AdVaLiEdBtn } from './components/admin/AdminVoiceActor';
+import { AdminVALiEd } from './components/admin/AdminVoiceActor'; // AdVaLiEdBtn 제거, AdminVALiEd 사용
+import AdminReport from './components/admin/AdminReport';
 import { HomePage, AniList, AniDetail, Notice, NoticeDetail, ErrorPage } from './pages'; // ErrorPage 추가
 import './App.css';
 import ChaPostDetail from './pages/character/ChaPost/ChaPostDetail';
 import { UserLogin, UserJoin, UserMyPage } from './pages/user';
 import { MyInfo, MyLikes, MyPosts, MyInquiries, MyLines } from './components/user/mypage';
-import UserSocialJoinForm from './components/user/UserSocialJoinForm'; // 추가
+import UserSocialJoinForm from './components/user/UserSocialJoinForm';
 import { AdminAniLiEd, AdminAniEdit } from './components/admin/AdminAni';
 import { useUser } from './context/UserContext';
 import ScrollToTop from './components/common/ScrollToTop';
@@ -36,40 +37,15 @@ axios.defaults.withCredentials = true; // 모든 요청에 쿠키를 포함
 function App() {
   const { userType } = useUser();
   const [searchLis, setSearchLis] = useState([]);
-  const [posts, setPosts] = useState([]);
+  // const [posts, setPosts] = useState([]); // 백엔드 API 사용으로 제거
 
   const handleSavePost = (newPostData) => {
-    const newId =
-      posts.length > 0 ? Math.max(...posts.map((p) => p.id)) + 1 : 1;
-    const newPost = {
-      id: newId,
-      ...newPostData,
-      writer: '새 작성자',
-      date: new Date().toISOString().slice(0, 10),
-      views: 0,
-      likes: 0,
-    };
-    setPosts((prevPosts) => [newPost, ...prevPosts]);
+    // 백엔드 API 사용으로 더 이상 사용되지 않음
+    console.log("New post saved:", newPostData);
   };
   
   useEffect(() => {
-    const localAxios = axios.create({
-      baseURL: 'http://localhost:5173'
-    });
-
-    localAxios.get('/data/userInfo.json')
-      .then(res => setSearchLis(res.data.userInfo))
-      .catch(e => console.error('유저 정보 로드 실패 (목 데이터):', e));
-
-    localAxios.get('/data/userPosts.json')
-      .then(res => {
-        const postsWithWriter = res.data.map(post => ({
-          ...post,
-          writer: post.writer || '익명'
-        }));
-        setPosts(postsWithWriter);
-      })
-      .catch(e => console.error('게시글 정보 로드 실패 (목 데이터):', e));
+    // 목 데이터 로딩 로직 제거
   }, []);
 
   return (
@@ -78,7 +54,7 @@ function App() {
       <Routes>
         <Route path='/login' element={<UserLogin />} />
         <Route path='/join' element={<UserJoin />} />
-        <Route path='/social-join' element={<UserSocialJoinForm />} /> {/* 소셜 회원가입 라우트 추가 */}
+        <Route path='/social-join' element={<UserSocialJoinForm />} />
 
         {userType !== 'admin' && (
           <Route path="/" element={<AppRoute />}>
@@ -91,9 +67,9 @@ function App() {
             <Route path="/chaPostEdit/:id" element={<ChaPostEdit />} />
             <Route path="/chaCvList" element={<ChaCvList />} />
             <Route path="/chaCvDetail/:id" element={<ChaCvDetail />} />
-            <Route path="/chaPost" element={<ChaPost posts={posts} />} />
-            <Route path="/chaNewPost" element={<ChaNewPost onSavePost={handleSavePost} />} />
-            <Route path="/chaPostDetail/:id" element={<ChaPostDetail posts={posts} setPosts={setPosts} />} />
+            <Route path="/chaPost" element={<ChaPost />} />
+            <Route path="/chaNewPost" element={<ChaNewPost />} />
+            <Route path="/chaPostDetail/:id" element={<ChaPostDetail />} />
             <Route path="/notice" element={<Notice />} />
             <Route path="/notice/:id" element={<NoticeDetail />} />
             
@@ -117,9 +93,11 @@ function App() {
             <Route path="/AdminVA" element={<AdminVA />} />
             <Route path="/AdCuSeAsk" element={<AdCuSeAsk />} />
             <Route path="/AdFAQ" element={<AdFAQ />} />
+            {/* AdminVALiEd로 통합 */}
             <Route path="/AdminVALiEd/:id" element={<AdminVALiEd />} />
-            <Route path="/Adedit/:id" element={<AdVaLiEdBtn />} />
-            <Route path="/AdNew" element={<AdVaLiEdBtn />} />
+            <Route path="/Adedit/:id" element={<AdminVALiEd />} />
+            <Route path="/AdNew" element={<AdminVALiEd />} />
+            
             <Route path="/AdminChaFL" element={<AdminChaFL />} />
             <Route path="/AdminChaBoard" element={<AdminChaBoard />} />
             <Route path="/AdminAni" element={<AdminAni />} />
@@ -127,6 +105,7 @@ function App() {
             <Route path="/AdminAni/edit/:id" element={<AdminAniEdit />} />
             <Route path="/AdminAni/tag" element={<AdminAniTag />} />
             <Route path="/AdminNotice" element={<AdminNotice />} />
+            <Route path="/AdminReport" element={<AdminReport />} />
           </Route>
         )}
 
