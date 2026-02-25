@@ -1,11 +1,13 @@
 import { useState } from "react";
 import axios from "axios";
 import { ChevronDown, CheckCircle, MessageSquare, Save } from 'lucide-react';
+import { useUser } from "../../../context/UserContext";
 
 const AdCSAskLi = ({ userAsks, userAsk, idx, setUserAsks }) => {
     const [isVisible, setIsVisible] = useState(false);
     const [ansTitleInput, setAnsTitleInput] = useState('');
     const [ansInput, setAnsInput] = useState('');
+    const { userInfo } = useUser();
 
     const visibleContent = () => {
         setIsVisible(!isVisible);
@@ -25,17 +27,16 @@ const AdCSAskLi = ({ userAsks, userAsk, idx, setUserAsks }) => {
             return;
         }
 
-        const storedUser = JSON.parse(localStorage.getItem("user"));
-            if (!storedUser || !storedUser.id) {
-                alert("관리자 로그인 정보가 없습니다.");
-                return;
-            }
+        if (!userInfo || !userInfo.id) {
+            alert("관리자 로그인 정보가 없습니다.");
+            return;
+        }
 
         try{
             const response = await axios.put(`/api/AdCuSeAsk/Edit/${userAsk.id}`, {
                 ansTitle: ansTitleInput,
                 ansContent: ansInput,
-                adminId: storedUser.id
+                adminId: userInfo.id
             });
             if (response.status === 200) {
                 const changeUserAsk = userAsks.map(userA =>
@@ -47,7 +48,7 @@ const AdCSAskLi = ({ userAsks, userAsk, idx, setUserAsks }) => {
                 setIsVisible(false);
             }
         }catch(e){
-            console.error("저장 중 에러 발생:", error);
+            console.error("저장 중 에러 발생:", e);
             alert("DB 저장에 실패했습니다.");
         }
     }
