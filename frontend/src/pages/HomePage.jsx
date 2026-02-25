@@ -11,42 +11,6 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "./HomePage.css";
 
-// const HomePage = () => {
-//   const [items, setItems] = useState([]);
-//
-//
-//     const userData = {
-//       test: '안녕하세요',
-//       userName: '안녕로봇'
-//     };
-//
-//
-//  useEffect(() => {
-//    const fetchData = async () => {
-//      try {
-//        const response = await fetch('/api/anipang', {
-//          method: 'POST',
-//          headers: {
-//            'Content-Type': 'application/json',
-//          },
-//          body: JSON.stringify(userData),
-//        });
-//
-//        if (!response.ok) {
-//          throw new Error('네트워크 응답이 좋지 않습니다.');
-//        }
-//
-//        const result = await response.json();
-//        console.log("성공:", result);
-//
-//      } catch (error) {
-//        // try를 썼다면 반드시 catch로 에러를 잡아줘야 합니다.
-//        console.error("데이터 전송 중 에러 발생:", error);
-//      }
-//    };
-//
-//    fetchData();
-//  }, [userData]); // userData가 변경될 때마다 실행되도록 의존성 배열에 추가
 const HomePage = () => {
   // State 선언 추가!
   const [fantasyItems, setFantasyItems] = useState([]);
@@ -126,7 +90,7 @@ useEffect(()=> {
                     {/* 좋아요 표시 */}
                       <div className="absolute top-4 left-4 glass-panel px-3 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-black text-primary shadow-sm">
                         <Star size={12} fill="currentColor" />
-                        {item.likes}
+                        {item.likes || 0}
                       </div>
                     <div className="absolute top-4 left-4 glass-panel px-3 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-black text-primary shadow-sm">
                       <Star size={12} fill="currentColor" />
