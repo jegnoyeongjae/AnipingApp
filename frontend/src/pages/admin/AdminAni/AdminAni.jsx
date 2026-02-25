@@ -72,7 +72,7 @@ const AdminAni = () => {
                                 idx={idx + 1}
                                 ani={ani}
                                 key={ani.id}
-                                onDelete={() => handleDeleteAn(ani.id)}
+                                onDelete={() => handleDeleteAni(ani.id)}
                             />
                         )}
                     </ul>

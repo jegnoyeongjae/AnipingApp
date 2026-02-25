@@ -23,6 +23,21 @@ public class AdAniDto {
     private Integer viewCount;
     private String categoryName;
 
+    public static AdAniDto fromEntity(AdAniEntity entity) {
+        return AdAniDto.builder()
+                .id(entity.getId())
+                .title(entity.getTitle())
+                .director(entity.getDirector())
+                .studio(entity.getStudio())
+                .description(entity.getDescription())
+                .date(entity.getDate())
+                .grade(entity.getGrade())
+                .aniPv(entity.getAniPv())
+                .cateId(entity.getCateId())
+                .viewCount(entity.getViewCount())
+                .build();
+    }
+
     public AdAniEntity toEntity() {
         return AdAniEntity.builder()
                 .id(this.id)

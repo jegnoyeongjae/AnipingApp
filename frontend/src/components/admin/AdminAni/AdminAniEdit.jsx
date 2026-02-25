@@ -25,6 +25,7 @@ const AdminAniEdit = () => {
     const [mainImage, setMainImage] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
     const [characters, setCharacters] = useState([]); // 캐릭터 상태를 여기서 관리
+    const [deletedCharIds, setDeletedCharIds] = useState([]);
 
     useEffect(() => {
         // 카테고리 목록 로드
@@ -35,27 +36,28 @@ const AdminAniEdit = () => {
             { id: 4, name: '일상' },
         ]);
 
-    if (isEditing) {
-        axios.get(`/api/AdminAni/${id}`)
-            .then(res => {
-                setFormData(res.data);
-                if (res.data.aniPvImg) setPreviewUrl(res.data.aniPvImg);
-        })
-            .catch(err => {
-                console.error("데이터 로드 실패:", err);
-                alert("정보를 불러오지 못했습니다.");
-        });
+        if (isEditing) {
+            // 애니메이션
+            axios.get(`/api/AdminAni/${id}`).then(res => setFormData(res.data));
 
-            // 2. 이미지 정보 로드 (필요시 활성화)
-            /*
-        axios.get(`/api/files?targetType=ANILIST&targetId=${id}`)
-            .then(res => {
-                if (res.data && res.data.length > 0) {
-                    setMainImage(res.data[0]);
-                }
+            // 이미지
+            axios.get(`/api/files`, {
+                params: { targetType: 'ANILIST', targetId: id }
             })
-            .catch(err => console.error("이미지 로드 실패:", err));
-            */
+                .then(res => {
+                    if (res.data && res.data.length > 0) {
+                        // 백엔드에서 준 파일 경로(URL)를 미리보기 state에 저장
+                        setPreviewUrl(res.data[0].fileUrl);
+                    }
+                });
+
+            //캐릭터
+            axios.get(`/api/AdminChaBoard/ani/${id}`)
+                .then(res => {
+                    console.log("불러온 캐릭터 목록:", res.data);
+                    setCharacters(res.data);
+                })
+                .catch(err => console.error("캐릭터 목록 로딩 실패:", err));
         }
     }, [id, isEditing]);
 
@@ -79,6 +81,12 @@ const AdminAniEdit = () => {
         if (fileInputRef.current) fileInputRef.current.value = "";
     };
 
+    const handleDeleteCharacter = (id) => {
+        if (id) {
+            setDeletedCharIds(prev => [...prev, id]);
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         
@@ -88,46 +96,62 @@ const AdminAniEdit = () => {
                 await axios.put(`/api/AdminAni/${id}`, formData);
                 alert("수정되었습니다.");
             } else {
-                await axios.post('/api/AdminAni', formData);
-                targetId = res.data.id;
+                const response = await axios.post('/api/AdminAni', formData);
+                targetId = response.data.id; // DB에서 자동 생성된 ID (Primary Key)
                 alert("등록되었습니다.");
             }
 
-            // 2. 메인 이미지 업로드
-            if (mainImage) {
+            //메인 이미지
+            if (mainImage && mainImage instanceof File) {
                 const imageFormData = new FormData();
-                imageFormData.append('file', mainImage);
+
+                imageFormData.append('targetType', 'ANILIST');
                 imageFormData.append('targetId', targetId);
-                // await axios.post('/api/files/upload', imageFormData);
+                imageFormData.append('files', mainImage);
+
+                await axios.post('/api/files/upload', imageFormData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
             }
 
-            // 3. 캐릭터 정보 및 이미지 저장
-            for (const char of characters) {
-                const charFormData = { aniId: targetId, name: char.name, cvId: char.cvId };
-                let charId = char.id;
+            alert(isEditing ? "수정되었습니다." + navigate('/AdminAni/${targetId}') : "등록되었습니다." + navigate('/AdminAni'));
 
-                if (char.isNew) {
-                    // const res = await axios.post('/api/admin/characters', charFormData);
-                    // charId = res.data.id;
-                    console.log("신규 캐릭터 저장:", charFormData);
-                } else {
-                    // await axios.put(`/api/admin/characters/${char.id}`, charFormData);
-                    console.log("기존 캐릭터 수정:", charFormData);
+            // 캐릭터
+            if (deletedCharIds.length > 0) {
+                for (const deleteId of deletedCharIds) {
+                    await axios.delete(`/api/AdminChaBoard/${deleteId}`);
                 }
+                console.log("삭제 완료된 ID들:", deletedCharIds);
+            }
 
-                if (char.image) {
-                    const charImageFormData = new FormData();
-                    charImageFormData.append('targetType', 'CHARACTER');
-                    charImageFormData.append('targetId', charId);
-                    charImageFormData.append('files', char.image);
-                    // await axios.post('/api/files/upload', charImageFormData);
+            for (const char of characters) {
+                const charRes = await axios.post('/api/AdminChaBoard', {
+                    id: char.id || null,
+                    aniId: targetId,
+                    name: char.name,
+                    cvId: char.cvId || 1
+                });
+
+                const savedCharId = charRes.data.id;
+
+                if (char.image instanceof File) {
+                    const fileFormData = new FormData();
+                    fileFormData.append('targetType', 'CHARACTER');
+                    fileFormData.append('targetId', savedCharId);
+                    fileFormData.append('files', char.image);
+
+                    await axios.post('/api/files/upload', fileFormData, {
+                        headers: { 'Content-Type': 'multipart/form-data' }
+                    });
                 }
             }
 
             navigate('/AdminAni');
         } catch (error) {
             console.error("저장 실패:", error);
-            alert("저장 중 오류가 발생했습니다.");
+            alert(`저장 중 오류 발생: ${error.response?.data?.message || error.message}`);
         }
     };
 
@@ -253,7 +277,7 @@ const AdminAniEdit = () => {
                 </div>
                 
                 {/* 캐릭터 관리 컴포넌트 */}
-                <AdminAniCha characters={characters} setCharacters={setCharacters} />
+                <AdminAniCha characters={characters} setCharacters={setCharacters} onDelete={handleDeleteCharacter} />
 
                 <div className="flex justify-end pt-6">
                     <button type="submit" className="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-lg font-bold shadow hover:shadow-lg hover:-translate-y-0.5 transition-all">

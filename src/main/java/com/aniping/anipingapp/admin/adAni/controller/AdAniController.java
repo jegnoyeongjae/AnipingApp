@@ -30,9 +30,10 @@ public class AdAniController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createAni(@RequestBody AdAniDto dto) {
-        adAniService.saveAni(dto);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<AdAniDto> createAni(@RequestBody AdAniDto dto) {
+        AdAniDto savedDto = adAniService.saveAni(dto);
+
+        return ResponseEntity.ok(savedDto);
     }
 
     @PutMapping("/{id}")

@@ -50,8 +50,15 @@ public class AdAniService {
     }
 
     @Transactional
-    public void saveAni(AdAniDto dto) {
-        adAniRepository.save(dto.toEntity());
+    public AdAniDto saveAni(AdAniDto dto) {
+        // 1. DTO를 Entity로 변환
+        AdAniEntity entity = dto.toEntity();
+
+        // 2. DB 저장 (이때 id가 자동 생성됨)
+        AdAniEntity savedEntity = adAniRepository.save(entity);
+
+        // 3. 저장된 Entity를 다시 DTO로 변환하여 반환 (id 포함됨)
+        return AdAniDto.fromEntity(savedEntity);
     }
 
     @Transactional
