@@ -35,21 +35,27 @@ const AdminAniEdit = () => {
             { id: 4, name: '일상' },
         ]);
 
-        if (isEditing) {
-            // 애니메이션 정보 로드
-            // axios.get(`/api/admin/anilist/${id}`).then(res => setFormData(res.data));
-            
-            // 이미지 정보 로드
-            axios.get(`/api/files?targetType=ANILIST&targetId=${id}`)
-                .then(res => {
-                    if (res.data && res.data.length > 0) {
-                        setMainImage(res.data[0]);
-                    }
-                })
-                .catch(err => console.error("이미지 로드 실패:", err));
-            
-            // 캐릭터 정보 로드
-            // axios.get(`/api/admin/anilist/${id}/characters`).then(res => setCharacters(res.data));
+    if (isEditing) {
+        axios.get(`/api/AdminAni/${id}`)
+            .then(res => {
+                setFormData(res.data);
+                if (res.data.aniPvImg) setPreviewUrl(res.data.aniPvImg);
+        })
+            .catch(err => {
+                console.error("데이터 로드 실패:", err);
+                alert("정보를 불러오지 못했습니다.");
+        });
+
+            // 2. 이미지 정보 로드 (필요시 활성화)
+            /*
+        axios.get(`/api/files?targetType=ANILIST&targetId=${id}`)
+            .then(res => {
+                if (res.data && res.data.length > 0) {
+                    setMainImage(res.data[0]);
+                }
+            })
+            .catch(err => console.error("이미지 로드 실패:", err));
+            */
         }
     }, [id, isEditing]);
 
@@ -63,55 +69,41 @@ const AdminAniEdit = () => {
         if (file) {
             const url = URL.createObjectURL(file);
             setPreviewUrl(url);
-            setMainImage({ file: file }); 
+            setMainImage(file);
         }
     };
 
     const handleImageRemove = () => {
-        if (isEditing && mainImage && mainImage.id) {
-            if (window.confirm("이미지를 삭제하시겠습니까?")) {
-                axios.delete(`/api/files/${mainImage.id}`)
-                    .then(() => {
-                        setMainImage(null);
-                        setPreviewUrl(null);
-                        alert("이미지가 삭제되었습니다.");
-                    })
-                    .catch(err => alert("이미지 삭제 실패"));
-            }
-        } else {
-            setMainImage(null);
-            setPreviewUrl(null);
-        }
+        setMainImage(null);
+        setPreviewUrl(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         
         try {
-            // 1. 애니메이션 정보 저장/수정
-            let aniId = id;
+            let targetId = id;
             if (isEditing) {
-                // await axios.put(`/api/admin/anilist/${id}`, formData);
-                alert("수정되었습니다. (API 호출 생략)");
+                await axios.put(`/api/AdminAni/${id}`, formData);
+                alert("수정되었습니다.");
             } else {
-                // const res = await axios.post('/api/admin/anilist', formData);
-                // aniId = res.data.id;
-                aniId = Date.now(); // 임시 ID
-                alert("등록되었습니다. (API 호출 생략)");
+                await axios.post('/api/AdminAni', formData);
+                targetId = res.data.id;
+                alert("등록되었습니다.");
             }
 
             // 2. 메인 이미지 업로드
-            if (mainImage && mainImage.file) {
-                const uploadFormData = new FormData();
-                uploadFormData.append('targetType', 'ANILIST');
-                uploadFormData.append('targetId', aniId);
-                uploadFormData.append('files', mainImage.file);
-                // await axios.post('/api/files/upload', uploadFormData);
+            if (mainImage) {
+                const imageFormData = new FormData();
+                imageFormData.append('file', mainImage);
+                imageFormData.append('targetId', targetId);
+                // await axios.post('/api/files/upload', imageFormData);
             }
 
             // 3. 캐릭터 정보 및 이미지 저장
             for (const char of characters) {
-                const charFormData = { aniId, name: char.name, cvId: char.cvId };
+                const charFormData = { aniId: targetId, name: char.name, cvId: char.cvId };
                 let charId = char.id;
 
                 if (char.isNew) {
@@ -225,10 +217,10 @@ const AdminAniEdit = () => {
                         <div>
                             <label className={labelClass}>시청 등급</label>
                             <select name="grade" value={formData.grade} onChange={handleChange} className={inputClass}>
-                                <option value="all">전체 관람가</option>
-                                <option value="12">12세 관람가</option>
-                                <option value="15">15세 관람가</option>
-                                <option value="19">19세 관람가</option>
+                                <option value="ALL">전체 관람가</option>
+                                <option value="G12">12세 관람가</option>
+                                <option value="G15">15세 관람가</option>
+                                <option value="G19">19세 관람가</option>
                             </select>
                         </div>
 

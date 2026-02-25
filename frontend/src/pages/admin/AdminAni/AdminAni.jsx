@@ -8,34 +8,33 @@ const AdminAni = () => {
     const [anis, setAnis] = useState([]);
 
     useEffect(() => {
-        const loadData = async () => {
-            // 1. 로컬 스토리지에서 데이터 확인
-            const storedAnis = localStorage.getItem('admin_anis');
-            if (storedAnis) {
-                setAnis(JSON.parse(storedAnis));
-            } else {
-                // 2. 없으면 JSON 파일에서 로드 후 로컬 스토리지에 저장
-                try {
-                    const response = await axios.get('/data/animeInfoData.json');
-                    setAnis(response.data);
-                    localStorage.setItem('admin_anis', JSON.stringify(response.data));
-                } catch (e) {
-                    console.error(e);
-                }
-            }
-        };
         loadData();
     }, []);
+
+    const loadData = async () => {
+        try {
+            const response = await axios.get(`/api/AdminAni`);
+            setAnis(response.data);
+        } catch (e) {
+            console.error("데이터 로드 실패:", e);
+        }
+    };
 
     // 삭제 기능 추가 (AdminAniLi에서 호출할 수 있도록 props로 전달하거나, 여기서 처리)
     // AdminAniLi는 Link로 감싸져 있지 않고 내부에서 navigate를 사용하므로, 
     // 삭제 버튼 클릭 시 이벤트를 받아 처리하는 것이 좋음.
     // 하지만 AdminAniLi 컴포넌트 구조상 props로 함수를 전달해야 함.
 
-    const handleDeleteAni = (id) => {
-        const newAnis = anis.filter(ani => ani.id !== id);
-        setAnis(newAnis);
-        localStorage.setItem('admin_anis', JSON.stringify(newAnis));
+    const handleDeleteAni = async (id) => {
+        if (!window.confirm("정말로 삭제하시겠습니까?")) return;
+
+        try {
+            await axios.delete(`/api/AdminAni/${id}`);
+            setAnis(anis.filter(ani => ani.id !== id));
+        } catch (e) {
+            alert("삭제에 실패했습니다.");
+            console.error(e);
+        }
     };
 
     return (
@@ -64,16 +63,16 @@ const AdminAni = () => {
                         <div className="col-span-4">Title</div>
                         <div className="col-span-2">Category</div>
                         <div className="col-span-2">Director</div>
-                        <div className="col-span-1 text-center">Episodes</div>
+                        <div className="col-span-1 text-center">ViewCount</div>
                         <div className="col-span-2 text-center">Actions</div>
                     </div>
-
                     <ul className="divide-y divide-slate-100">
-                        {anis.map(ani =>
+                        {anis.map((ani, idx)=>
                             <AdminAniLi
+                                idx={idx + 1}
                                 ani={ani}
                                 key={ani.id}
-                                onDelete={() => handleDeleteAni(ani.id)} // 삭제 함수 전달
+                                onDelete={() => handleDeleteAn(ani.id)}
                             />
                         )}
                     </ul>
