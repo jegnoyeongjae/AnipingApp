@@ -12,5 +12,6 @@ public class adChaDto {
     private Integer aniId;
     private String name;
     private Integer cvId;
+    private String voiceActorName;
     private String image;
 }

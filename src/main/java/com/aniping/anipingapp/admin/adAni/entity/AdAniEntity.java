@@ -43,9 +43,11 @@ public class AdAniEntity {
     @Column(name = "aniPv", columnDefinition = "TEXT")
     private String aniPv;
 
+    @Builder.Default
     @Column(name = "viewCount")
     private Integer viewCount = 0;
 
+    @Builder.Default
     @Column(name = "likes")
     private Integer likes = 0;
 

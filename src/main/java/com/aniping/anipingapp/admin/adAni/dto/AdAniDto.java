@@ -21,6 +21,7 @@ public class AdAniDto {
     private String aniPv;
     private Integer cateId;
     private Integer viewCount;
+    private Integer likes;
     private String categoryName;
 
     public static AdAniDto fromEntity(AdAniEntity entity) {
@@ -34,7 +35,8 @@ public class AdAniDto {
                 .grade(entity.getGrade())
                 .aniPv(entity.getAniPv())
                 .cateId(entity.getCateId())
-                .viewCount(entity.getViewCount())
+                .viewCount(entity.getViewCount() != null ? entity.getViewCount() : 0)
+                .likes(entity.getLikes() != null ? entity.getLikes() : 0)
                 .build();
     }
 
@@ -49,6 +51,8 @@ public class AdAniDto {
                 .grade(this.grade)
                 .aniPv(this.aniPv)
                 .cateId(this.cateId)
+                .viewCount(this.viewCount != null ? this.viewCount : 0)
+                .likes(this.likes != null ? this.likes : 0)
                 .build();
     }
 }

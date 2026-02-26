@@ -3,13 +3,17 @@ package com.aniping.anipingapp.admin.adCha.service;
 import com.aniping.anipingapp.admin.adCha.dto.adChaDto;
 import com.aniping.anipingapp.admin.adCha.entity.adChaEntity;
 import com.aniping.anipingapp.admin.adCha.repository.adChaRepository;
+import com.aniping.anipingapp.admin.adVoiceActor.repository.adVARepository;
 import com.aniping.anipingapp.global.constant.TargetType;
 import com.aniping.anipingapp.global.file.dto.FileResponseDto;
+import com.aniping.anipingapp.global.file.entity.File;
+import com.aniping.anipingapp.global.file.repository.FileRepository;
 import com.aniping.anipingapp.global.file.service.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,16 +22,23 @@ import java.util.stream.Collectors;
 public class AdChaService {
 
     private final adChaRepository adChaRepo;
+    private final adVARepository adVaRepo;
     private final FileService fileService;
+    private final FileRepository fileRepository;
 
-    // 애니메이션의 캐릭터 조회
     public List<adChaDto> getCharactersByAniId(Integer aniId) {
         return adChaRepo.findByAniId(aniId).stream()
                 .map(entity -> {
                     adChaDto dto = convertToDto(entity);
 
-                    List<FileResponseDto> files = fileService.getFilesByTarget(TargetType.CHARACTER, entity.getId());
+                    // 성우 이름 가져오기
+                    if (entity.getCvId() != null) {
+                        adVaRepo.findById(entity.getCvId())
+                                .ifPresent(va -> dto.setVoiceActorName(va.getName()));
+                    }
 
+                    // 이미지 가져오기
+                    List<FileResponseDto> files = fileService.getFilesByTarget(TargetType.CHARACTER, entity.getId());
                     if (!files.isEmpty()) {
                         dto.setImage(files.get(0).getFileUrl());
                     }
@@ -36,36 +47,49 @@ public class AdChaService {
                 .collect(Collectors.toList());
     }
 
-    // 캐릭터 저장 (생성 및 수정 공용)
     @Transactional
     public adChaDto saveCharacter(adChaDto dto) {
         adChaEntity entity;
 
         if (dto.getId() != null && dto.getId() > 0) {
-            // 수정 모드
             entity = adChaRepo.findById(dto.getId())
                     .orElseThrow(() -> new IllegalArgumentException("해당 캐릭터가 없습니다. id=" + dto.getId()));
             entity.setName(dto.getName());
             entity.setCvId(dto.getCvId());
-            // 필요한 필드 업데이트...
+            entity.setAniId(dto.getAniId());
         } else {
-            // 신규 등록 모드
             entity = adChaEntity.builder()
                     .aniId(dto.getAniId())
                     .cvId(dto.getCvId())
                     .name(dto.getName())
-                    .active("accept") // 관리자 등록이므로 즉시 승인 상태
+                    .active("accept")
                     .voteCount(0)
                     .build();
         }
 
         adChaEntity saved = adChaRepo.save(entity);
-        return convertToDto(saved);
+
+        // 반환 시 성우 이름까지 포함해서 반환하도록 처리
+        adChaDto responseDto = convertToDto(saved);
+        if (saved.getCvId() != null) {
+            adVaRepo.findById(saved.getCvId())
+                    .ifPresent(va -> responseDto.setVoiceActorName(va.getName()));
+        }
+        return responseDto;
     }
 
     @Transactional
     public void deleteCharacter(Integer id) {
-        adChaRepo.deleteById(id);
+        adChaEntity character = adChaRepo.findById(id).orElseThrow();
+
+        List<File> files = fileRepository.findByTargetTypeAndTargetIdAndStatus(
+                TargetType.CHARACTER, id, File.FileStatus.ACTIVE);
+
+        if (!files.isEmpty()) {
+            fileRepository.deleteAll(files);
+        }
+
+        adChaRepo.delete(character);
     }
 
     private adChaDto convertToDto(adChaEntity entity) {

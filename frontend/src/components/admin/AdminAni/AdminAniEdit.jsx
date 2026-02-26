@@ -28,13 +28,17 @@ const AdminAniEdit = () => {
     const [deletedCharIds, setDeletedCharIds] = useState([]);
 
     useEffect(() => {
-        // 카테고리 목록 로드
-        setCategories([
-            { id: 1, name: '판타지' },
-            { id: 2, name: '액션' },
-            { id: 3, name: '로맨스' },
-            { id: 4, name: '일상' },
-        ]);
+        axios.get('/api/AdminAni/tag')
+        .then(res => {
+            console.log("카테고리 로드 성공:", res.data);
+            setCategories(res.data);
+        })
+        .catch(err => {
+            console.error("카테고리 목록 로딩 실패:", err);
+            setCategories([
+                { id: 1, name: '로드 실패' },
+            ]);
+        });
 
         if (isEditing) {
             // 애니메이션
@@ -89,6 +93,11 @@ const AdminAniEdit = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const dataToSend = {
+            ...formData,
+            cateId: parseInt(formData.cateId)
+        };
+        await axios.post('/api/AdminAni', dataToSend);
         
         try {
             let targetId = id;
@@ -116,7 +125,8 @@ const AdminAniEdit = () => {
                 });
             }
 
-            alert(isEditing ? "수정되었습니다." + navigate('/AdminAni/${targetId}') : "등록되었습니다." + navigate('/AdminAni'));
+            alert(isEditing ? "수정되었습니다." : "등록되었습니다.");
+            + navigate('/AdminAni')
 
             // 캐릭터
             if (deletedCharIds.length > 0) {

@@ -20,15 +20,14 @@ public class AdAniService {
         List<AdAniEntity> entities = adAniRepository.findAllByDeleteAtIsNull();
 
         return entities.stream()
-                .map(entity -> AdAniDto.builder()
-                        .id(entity.getId())
-                        .title(entity.getTitle())
-                        .director(entity.getDirector())
-                        .studio(entity.getStudio())
-                        .cateId(entity.getCateId())
-                        .categoryName(entity.getCategory() != null ? entity.getCategory().getName() : "미지정")
-                        .viewCount(entity.getViewCount())
-                        .build())
+                .map(entity -> {
+                    AdAniDto dto = AdAniDto.fromEntity(entity);
+
+                    if (dto.getCategoryName() == null) {
+                        dto.setCategoryName("미지정");
+                    }
+                    return dto;
+                })
                 .toList();
     }
 
@@ -36,28 +35,20 @@ public class AdAniService {
         AdAniEntity entity = adAniRepository.findByIdAndDeleteAtIsNull(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 애니메이션이 없습니다."));
 
-        return AdAniDto.builder()
-                .id(entity.getId())
-                .title(entity.getTitle())
-                .director(entity.getDirector())
-                .studio(entity.getStudio())
-                .description(entity.getDescription())
-                .date(entity.getDate())
-                .grade(entity.getGrade())
-                .aniPv(entity.getAniPv())
-                .cateId(entity.getCateId())
-                .build();
+        return AdAniDto.fromEntity(entity);
     }
 
     @Transactional
     public AdAniDto saveAni(AdAniDto dto) {
-        // 1. DTO를 Entity로 변환
         AdAniEntity entity = dto.toEntity();
 
-        // 2. DB 저장 (이때 id가 자동 생성됨)
+        if (entity.getId() == null) {
+            if (entity.getViewCount() == null) entity.setViewCount(0);
+            if (entity.getLikes() == null) entity.setLikes(0);
+        }
+
         AdAniEntity savedEntity = adAniRepository.save(entity);
 
-        // 3. 저장된 Entity를 다시 DTO로 변환하여 반환 (id 포함됨)
         return AdAniDto.fromEntity(savedEntity);
     }
 
