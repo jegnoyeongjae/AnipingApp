@@ -33,4 +33,18 @@ public class adChaController {
         adChaService.deleteCharacter(id);
         return ResponseEntity.noContent().build();
     }
+
+    //characterBoard
+    // 조회
+    @GetMapping
+    public ResponseEntity<List<adChaDto>> getAllRequests() {
+        return ResponseEntity.ok(adChaService.getAllRequests());
+    }
+
+    // 승인 처리
+    @PatchMapping("/{id}/approve")
+    public ResponseEntity<Void> approveCharacter(@PathVariable Integer id) {
+        adChaService.approveCharacter(id);
+        return ResponseEntity.ok().build();
+    }
 }

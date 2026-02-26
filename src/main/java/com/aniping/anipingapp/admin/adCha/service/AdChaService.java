@@ -1,8 +1,11 @@
 package com.aniping.anipingapp.admin.adCha.service;
 
+import com.aniping.anipingapp.admin.adAni.dto.AdAniDto;
+import com.aniping.anipingapp.admin.adAni.repository.AdAniRepository;
 import com.aniping.anipingapp.admin.adCha.dto.adChaDto;
 import com.aniping.anipingapp.admin.adCha.entity.adChaEntity;
 import com.aniping.anipingapp.admin.adCha.repository.adChaRepository;
+import com.aniping.anipingapp.admin.adUser.repository.AdUserRepository;
 import com.aniping.anipingapp.admin.adVoiceActor.repository.adVARepository;
 import com.aniping.anipingapp.global.constant.TargetType;
 import com.aniping.anipingapp.global.file.dto.FileResponseDto;
@@ -25,6 +28,8 @@ public class AdChaService {
     private final adVARepository adVaRepo;
     private final FileService fileService;
     private final FileRepository fileRepository;
+    private final AdUserRepository userRepository;
+    private final AdAniRepository adAniRepo;
 
     public List<adChaDto> getCharactersByAniId(Integer aniId) {
         return adChaRepo.findByAniId(aniId).stream()
@@ -98,6 +103,35 @@ public class AdChaService {
                 .aniId(entity.getAniId())
                 .name(entity.getName())
                 .cvId(entity.getCvId())
+                .active(entity.getActive())
+                .userId(entity.getUserId())
+                .createAt(entity.getCreateAt())
                 .build();
+    }
+
+    //characterBoard
+    public List<adChaDto> getAllRequests() {
+        return adChaRepo.findAll().stream()
+                .map(entity -> {
+                    adChaDto dto = convertToDto(entity);
+                    if (entity.getUserId() != null) {
+                        userRepository.findById(entity.getUserId())
+                                .ifPresent(user -> dto.setNickname(user.getNickname()));
+                    }
+                    if (entity.getAniId() != null) {
+                        adAniRepo.findById(entity.getAniId())
+                                .map(AdAniDto::fromEntity)
+                                .ifPresent(aniDto -> dto.setAnimeTitle(aniDto.getTitle()));
+                    }
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void approveCharacter(Integer id) {
+        adChaEntity entity = adChaRepo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
+        entity.setActive("accept");
     }
 }

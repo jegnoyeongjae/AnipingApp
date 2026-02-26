@@ -2,6 +2,8 @@ package com.aniping.anipingapp.admin.adCha.dto;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -14,4 +16,9 @@ public class adChaDto {
     private Integer cvId;
     private String voiceActorName;
     private String image;
+    private String active;
+    private String animeTitle;
+    private Integer userId;
+    private LocalDateTime createAt;
+    private String nickname;
 }
