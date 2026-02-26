@@ -55,11 +55,17 @@ const AdminChaBoard = () => {
         }
     };
 
-    const handleReject = (id) => {
-        if (confirm('이 캐릭터 신청을 거절하시겠습니까? (목록에서 삭제됩니다)')) {
-            const updatedRequests = requests.filter(req => req.id !== id);
-            setRequests(updatedRequests);
-            localStorage.setItem('admin_chaRequests', JSON.stringify(updatedRequests));
+    const handleReject = async (id) => {
+        if (confirm('이 캐릭터 신청을 거절하시겠습니까?')) {
+            try {
+                await axios.patch(`/api/AdminChaBoard/${id}/reject`);
+
+                alert("거절 처리되었습니다.");
+                loadData();
+            } catch (e) {
+                console.error("거절 실패:", e);
+                alert("거절 처리 중 오류가 발생했습니다.");
+            }
         }
     };
 
@@ -124,6 +130,7 @@ const AdminChaBoard = () => {
                             <option value="all">모든 상태</option>
                             <option value="accept">등록완료</option>
                             <option value="waiting">신청대기</option>
+                            <option value="reject">거절됨</option>
                         </select>
 
                         <select 
@@ -158,21 +165,24 @@ const AdminChaBoard = () => {
                                 <div className="col-span-2 text-slate-500 text-sm">{req.nickname ? `${req.nickname}` : '시스템입력'}</div>
                                 <div className="col-span-1 text-slate-400 text-sm">{req.createAt ? req.createAt.split('T')[0] : '-'}</div>
                                 <div className="col-span-2 flex items-center justify-center gap-2">
-                                {req.active === 'accept' ? (
-                                    <span className="flex items-center gap-1 text-xs font-bold text-green-600 bg-green-100 px-2.5 py-1 rounded-full">
-                                        <CheckCircle size={12} /> 등록완료
-                                    </span>
-                                ) : (
-                                    <span className="flex items-center gap-1 text-xs font-bold text-orange-600 bg-orange-100 px-2.5 py-1 rounded-full">
-                                        신청대기
-                                    </span>
-                                )}
+                                    {req.active === 'accept' && (
+                                        <span className="flex items-center gap-1 text-xs font-bold text-green-600 bg-green-100 px-2.5 py-1 rounded-full">
+                                            <CheckCircle size={12} /> 등록완료
+                                        </span>
+                                    )}
 
-                                {req.active === 'waiting' && (
-                                    <button onClick={() => handleApprove(req.id)} className="...">
-                                        <CheckCircle size={16} />
-                                    </button>
-                                )}
+                                    {req.active === 'reject' && (
+                                        <span className="flex items-center gap-1 text-xs font-bold text-red-600 bg-red-100 px-2.5 py-1 rounded-full">
+                                            <XCircle size={12} /> 거절됨
+                                        </span>
+                                    )}
+
+                                    {req.active === 'waiting' && (
+                                        <button onClick={() => handleApprove(req.id)} className="...">
+                                            <CheckCircle size={16} />
+                                        </button>
+                                    )}
+
                                 </div>
                             </li>
                         ))}

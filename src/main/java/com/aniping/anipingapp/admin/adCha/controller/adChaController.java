@@ -47,4 +47,11 @@ public class adChaController {
         adChaService.approveCharacter(id);
         return ResponseEntity.ok().build();
     }
+
+    //거절
+    @PatchMapping("/{id}/reject")
+    public ResponseEntity<Void> rejectCharacter(@PathVariable Integer id) {
+        adChaService.rejectCharacter(id);
+        return ResponseEntity.ok().build();
+    }
 }

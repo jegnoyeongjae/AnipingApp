@@ -58,7 +58,7 @@ public class SecurityConfig {
                                 "/api/oauth/join", // 소셜 회원가입 API 허용
                                 "/api/cs/faq"
                         ).permitAll()
-                        .requestMatchers("/api/admin/**", "/api/AdUserLi/**", "/api/AdCuSeAsk/**", "/api/AdFAQ/**", "/api/AdminAni/**", "/api/AdminAniLiEd/**", "/api/AdminNotice/**","/api/AdminAni/tag/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**", "/api/AdUserLi/**", "/api/AdCuSeAsk/**", "/api/AdFAQ/**", "/api/AdminAni/**", "/api/AdminAniLiEd/**", "/api/AdminNotice/**","/api/AdminAni/tag/**", "/api/AdminChaBoard/**","/api/AdminChaFL/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
 

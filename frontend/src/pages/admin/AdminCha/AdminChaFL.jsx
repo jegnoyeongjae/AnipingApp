@@ -13,22 +13,17 @@ const AdminChaFL = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
 
+    const loadData = async () => {
+        try {
+            const response = await axios.get('/api/AdminChaFL');
+            setChaFLs(response.data);
+            setFilteredChaFLs(response.data);
+        } catch (e) {
+            console.error("데이터 로딩 실패:", e);
+        }
+    };
+
     useEffect(() => {
-        const loadData = async () => {
-            const storedData = localStorage.getItem('admin_chaFLs');
-            if (storedData) {
-                const data = JSON.parse(storedData);
-                setChaFLs(data);
-            } else {
-                try {
-                    const response = await axios.get('/data/adminChaLine.json');
-                    setChaFLs(response.data);
-                    localStorage.setItem('admin_chaFLs', JSON.stringify(response.data));
-                } catch (e) {
-                    console.error("Failed to load adminChaLine.json:", e);
-                }
-            }
-        };
         loadData();
     }, []);
 
@@ -37,15 +32,17 @@ const AdminChaFL = () => {
         let result = chaFLs;
 
         if (searchTerm) {
-            result = result.filter(item => 
-                item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                item.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                item.user.toLowerCase().includes(searchTerm.toLowerCase())
+            result = result.filter(item =>
+                // title 대신 charName, user 대신 userNickname 사용
+                (item.charName && item.charName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (item.content && item.content.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (item.userNickname && item.userNickname.toLowerCase().includes(searchTerm.toLowerCase()))
             );
         }
 
         if (statusFilter !== 'all') {
-            result = result.filter(item => item.status === statusFilter);
+            // status 대신 active 사용
+            result = result.filter(item => item.active === statusFilter);
         }
 
         setFilteredChaFLs(result);
@@ -63,29 +60,39 @@ const AdminChaFL = () => {
     };
 
     // 액션 핸들러
-    const handleApprove = (id) => {
+    const handleApprove = async (id) => {
         if (confirm('이 명대사 신청을 승인하시겠습니까?')) {
-            const updatedData = chaFLs.map(item => 
-                item.id === id ? { ...item, status: 'registered' } : item
-            );
-            setChaFLs(updatedData);
-            localStorage.setItem('admin_chaFLs', JSON.stringify(updatedData));
+            try {
+                await axios.patch(`/api/AdminChaFL/${id}/approve`);
+                alert("승인되었습니다.");
+                loadData();
+            } catch (e) {
+                alert("승인 실패");
+            }
         }
     };
 
-    const handleReject = (id) => {
-        if (confirm('이 명대사 신청을 거절하시겠습니까? (목록에서 삭제됩니다)')) {
-            const updatedData = chaFLs.filter(item => item.id !== id);
-            setChaFLs(updatedData);
-            localStorage.setItem('admin_chaFLs', JSON.stringify(updatedData));
+    const handleReject = async (id) => {
+        if (confirm('이 명대사 신청을 거절하시겠습니까?')) {
+            try {
+                await axios.patch(`/api/AdminChaFL/${id}/reject`);
+                alert("거절 처리되었습니다.");
+                loadData();
+            } catch (e) {
+                alert("거절 실패");
+            }
         }
     };
 
-    const handleDelete = (id) => {
-        if (confirm('등록된 명대사를 삭제하시겠습니까?')) {
-            const updatedData = chaFLs.filter(item => item.id !== id);
-            setChaFLs(updatedData);
-            localStorage.setItem('admin_chaFLs', JSON.stringify(updatedData));
+    const handleDelete = async (id) => {
+        if (confirm('등록된 명대사를 영구 삭제하시겠습니까?')) {
+            try {
+                await axios.delete(`/api/AdminChaFL/${id}`);
+                alert("삭제되었습니다.");
+                loadData();
+            } catch (e) {
+                alert("삭제 실패");
+            }
         }
     };
 
@@ -123,8 +130,9 @@ const AdminChaFL = () => {
                             className="px-4 py-3 rounded-xl bg-white border border-slate-200 text-sm font-bold text-slate-600 focus:outline-none focus:border-primary cursor-pointer"
                         >
                             <option value="all">모든 상태</option>
-                            <option value="registered">등록완료</option>
-                            <option value="pending">신청대기</option>
+                            <option value="accept">등록완료</option>
+                            <option value="waiting">신청대기</option>
+                            <option value="reject">거절됨</option>
                         </select>
                         <select 
                             value={itemsPerPage} 
@@ -142,7 +150,7 @@ const AdminChaFL = () => {
                 <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                     <div className="grid grid-cols-12 gap-4 p-5 bg-slate-100/80 text-sm font-bold text-slate-500 uppercase tracking-wider text-left">
                         <div className="col-span-1 text-center">Image</div>
-                        <div className="col-span-3">Title</div>
+                        <div className="col-span-3">Character Name</div>
                         <div className="col-span-4">Content</div>
                         <div className="col-span-1 text-center">User</div>
                         <div className="col-span-1 text-center">Date</div>
@@ -171,7 +179,7 @@ const AdminChaFL = () => {
                 {/* 페이지네이션 */}
                 {totalPages > 1 && (
                     <div className="flex justify-center gap-2 mt-8">
-                        <button 
+                        <button
                             onClick={() => handlePageChange(currentPage - 1)}
                             disabled={currentPage === 1}
                             className="p-2 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"

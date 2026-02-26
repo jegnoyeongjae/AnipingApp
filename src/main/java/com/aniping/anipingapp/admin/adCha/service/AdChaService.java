@@ -128,10 +128,21 @@ public class AdChaService {
                 .collect(Collectors.toList());
     }
 
+    //승인
     @Transactional
     public void approveCharacter(Integer id) {
         adChaEntity entity = adChaRepo.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
         entity.setActive("accept");
+    }
+
+    //거절
+    @Transactional
+    public void rejectCharacter(Integer id) {
+        adChaEntity entity = adChaRepo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
+
+        // DB의 enum 값인 'reject'로 상태 변경
+        entity.setActive("reject");
     }
 }
