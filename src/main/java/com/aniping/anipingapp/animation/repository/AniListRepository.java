@@ -10,7 +10,17 @@ import java.util.List;
 
 @Repository
 public interface AniListRepository extends JpaRepository<AdAniEntity, Integer> {
-    // 카테고리별로 리스트를 가져오고 싶을 때를 대비해 미리 만들어둡니다.
-    @Query("SELECT a FROM AdAniEntity a WHERE category = :category")
-    List<AdAniEntity> findByCategory(@Param("category") String category);
+    // 네이티브 쿼리(Native Query)를 사용하면 DB 컬럼명 그대로 사용할 수 있어 가장 안전합니다.
+    @Query(value = "SELECT a.* FROM anilist a " +
+            "JOIN category c ON a.cateId = c.id " + // category 테이블은 id 컬럼 사용
+            "WHERE c.slug = :slug",
+            nativeQuery = true)
+    List<AdAniEntity> findBySlugDirectly(@Param("slug") String slug);
+
+    // Native Query를 사용해 DB 구조(id 컬럼)에 맞게 직접 매핑
+    @Query(value = "SELECT a.* FROM anilist a " +
+            "JOIN category c ON a.cateId = c.id " +
+            "WHERE c.slug = :slug",
+            nativeQuery = true)
+    List<AdAniEntity> findBySlug(@Param("slug") String slug);
 }

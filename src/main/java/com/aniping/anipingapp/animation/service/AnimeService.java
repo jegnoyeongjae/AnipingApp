@@ -4,6 +4,8 @@ import com.aniping.anipingapp.animation.dto.AnilistResponseDto;
 import java.util.List;
 
 public interface AnimeService {
+
+    List<AnilistResponseDto> getAllAnimeList(String slug);
     // 리턴 타입을 DTO 리스트로 변경
     List<AnilistResponseDto> getAnimeList(String category);
 

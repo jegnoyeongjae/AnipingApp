@@ -8,8 +8,8 @@ spring:
       client:
         registration:
           google:
-            client-id: ${oauth.google.clientId} 
-            client-secret: ${oauth.google.secret} 
+            client-id: ${oauth.google.clientId}
+            client-secret: ${oauth.google.secret}
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
             scope:
               - email
@@ -35,6 +35,7 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
+
   datasource:
     url: jdbc:mysql://3.36.75.243:3307/aniping?allowPublicKeyRetrieval=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
     username: root

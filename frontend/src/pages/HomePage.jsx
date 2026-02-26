@@ -22,26 +22,33 @@ const HomePage = () => {
   const [normalItems, setNormalItems] = useState([]);
 
 
-useEffect(()=> {
-    const fetchCategoryData = async (category, setter) => {
-        try {
-            await axios.get(`http://localhost8080/api/anime?category=${category}`)
-                .then(res => {
-                    console.log(res.data);
-                    setItem(res.data)})
-                    .catch(err => {
-                        console.error(err)});
-            }   catch(error) {
-                console.error(`데이터 조회 실패:`, error);
-            }
-        };
+useEffect(() => {
+ const fetchAllCategories = async () => {
+     try {
+       // 1. 모든 카테고리 요청을 동시에 병렬로 실행합니다.
+       // API 주소는 백엔드 컨트롤러의 @GetMapping 구조에 맞게 설정하세요.
+       const [fantasyRes, romanceRes, sfRes, mysteryRes, normalRes] = await Promise.all([
+         axios.get(`http://localhost:8080/api/animeList?category=cat-1`),
+         axios.get(`http://localhost:8080/api/animeList?category=cat-15`),
+         axios.get(`http://localhost:8080/api/animeList?category=cat-5`),
+         axios.get(`http://localhost:8080/api/animeList?category=cat-4`),
+         axios.get(`http://localhost:8080/api/animeList?category=cat-12`)
+       ]);
 
-        fetchCategoryData('fantasy', setFantasyItems);
-        fetchCategoryData('romance', setRomanceItems);
-        fetchCategoryData('sf', setSfItems);
-        fetchCategoryData('mystery', setMysteryItems);
-        fetchCategoryData('normal', setNormalItems);
-    }, []);
+       // 2. 각각의 응답 데이터를 상태(State)에 저장합니다.
+       setFantasyItems(fantasyRes.data);
+       setRomanceItems(romanceRes.data);
+       setSfItems(sfRes.data);
+       setMysteryItems(mysteryRes.data);
+       setNormalItems(normalRes.data);
+
+     } catch (error) {
+       console.error("데이터 조회 실패:", error);
+     }
+   };
+
+   fetchAllCategories();
+}, []); // 빈 배열로 두어 컴포넌트 마운트 시 한 번만 실행
 
   const renderCategory = (items, category, title, icon) => (
     <section className="my-32 px-6 md:px-12 relative">

@@ -23,7 +23,7 @@ const AniList = () => {
   console.log(category);
   useEffect(() => {
     const orderParam = sortType === "popular" ? "likes" : "";
-    axios.get(`http://localhost:8080/api/anime`,{
+    axios.get(`http://localhost:8080/api/animeList`,{
         params: {
               category: category, // 'fantasy' 등
              // order: orderParam,   // 'likes' 또는 'latest'

@@ -10,15 +10,20 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/anime")
+@RequestMapping("/api/animeList")
 @RequiredArgsConstructor
 public class AnimeController {
 
     private final AnimeService animeService;
 
+    @GetMapping("/allList")
+    public List<AnilistResponseDto> getAllAnimeList(@RequestParam String slug){
+        return  animeService.getAllAnimeList(slug);
+    }
+
     //애니 목록 조회
     @GetMapping
-    public List<AnilistResponseDto> getAnimeList(@Valid @RequestParam String category
+    public List<AnilistResponseDto> getAnimeList(@RequestParam String category
     ) {
         return animeService.getAnimeList(category);
     }

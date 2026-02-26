@@ -1,6 +1,7 @@
 package com.aniping.anipingapp.admin.adAni.entity;
 
 import com.aniping.anipingapp.admin.adTags.entity.AdTagsEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -49,7 +50,8 @@ public class AdAniEntity {
     private Integer likes = 0;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cateId", insertable = false, updatable = false)
+    @JoinColumn(name = "cateId",referencedColumnName = "cateId" ,insertable = false, updatable = false)
+    @JsonIgnore
     private AdTagsEntity category;
 
     @CreationTimestamp

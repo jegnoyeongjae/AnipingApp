@@ -21,9 +21,16 @@ public class AnimeServiceImpl implements AnimeService {
     private final AnimeFileRepository animefileRepository; // 파일 리포지토리 추가!
 
     @Override
+    public List<AnilistResponseDto> getAllAnimeList(String slug) {
+        List<AdAniEntity> aniList = aniListRepository.findBySlug(slug);
+
+        return aniList.stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+
+    @Override
     public List<AnilistResponseDto> getAnimeList(String category) {
         List<AdAniEntity> animes;
-            animes = aniListRepository.findByCategory_Id(category);
+            animes = aniListRepository.findBySlugDirectly(category);
 
 
         Stream<AnilistResponseDto> stream = animes.stream().map(this::convertToDto);
