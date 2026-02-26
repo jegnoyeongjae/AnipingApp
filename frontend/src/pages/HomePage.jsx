@@ -11,6 +11,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "./HomePage.css";
 
+
 const HomePage = () => {
 
   // State 선언 추가!
@@ -24,12 +25,14 @@ const HomePage = () => {
 useEffect(()=> {
     const fetchCategoryData = async (category, setter) => {
         try {
-            const response = await axios.get(
-                `http://localhost:8080/api/anime?category=${category}&order=likes&limit=10`
-                );
-                setter(response.data);
+            await axios.get(`http://localhost8080/api/anime?category=${category}`)
+                .then(res => {
+                    console.log(res.data);
+                    setItem(res.data)})
+                    .catch(err => {
+                        console.error(err)});
             }   catch(error) {
-                console.error(`${category}데이터 조회 실패:`, error);
+                console.error(`데이터 조회 실패:`, error);
             }
         };
 
@@ -77,7 +80,7 @@ useEffect(()=> {
                 <Link to={`/detail/${item.id}`}>
                   <div className="relative aspect-[3/4.2] overflow-hidden">
                     <img 
-                      src={item.imgUrl}
+                      src={'https://anipingapp-imagestorege.s3.ap-northeast-2.amazonaws.com/aniCha/ai.png'}
                       alt={item.title} 
                       className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
                     />

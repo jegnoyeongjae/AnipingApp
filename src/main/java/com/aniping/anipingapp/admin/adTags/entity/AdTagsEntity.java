@@ -2,6 +2,7 @@ package com.aniping.anipingapp.admin.adTags.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.context.annotation.Configuration;
 
 @Entity
 @Table(name = "category")
@@ -12,6 +13,7 @@ import lombok.*;
 public class AdTagsEntity {
 
     @Id
+    @Column(name = "cateId")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 

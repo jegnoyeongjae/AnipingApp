@@ -1,13 +1,15 @@
-package com.aniping.anipingapp.animation.dto; // 이 경로가 맞는지 확인!
+package com.aniping.anipingapp.animation.dto;
 
 import com.aniping.anipingapp.admin.adAni.entity.AdAniEntity;
+import com.aniping.anipingapp.admin.adTags.entity.AdTagsEntity;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.LocalDate;
 
 @Getter
-@NoArgsConstructor // JSON 변환을 위해 기본 생성자가 필요할 수 있습니다
-public class AnilistResponseDto {
+@Setter
+public class AniListCategoryDto {
     private Integer id;
     private String title;
     private String director;
@@ -16,8 +18,9 @@ public class AnilistResponseDto {
     private LocalDate date;
     private String grade;
     private String imgUrl;
+    private AdTagsEntity category;
 
-    public AnilistResponseDto(AdAniEntity anilist, String s3Key) {
+    public AniListCategoryDto(AdAniEntity anilist,AdTagsEntity category, String s3Key) {
         this.id = anilist.getId();
         this.title = anilist.getTitle();
         this.director = anilist.getDirector();
@@ -25,6 +28,8 @@ public class AnilistResponseDto {
         this.description = anilist.getDescription();
         this.date = anilist.getDate();
         this.grade = anilist.getGrade();
+        this.category = category;
         this.imgUrl = s3Key;
     }
+
 }

@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface AnimeService {
     // 리턴 타입을 DTO 리스트로 변경
-    List<AnilistResponseDto> getAnimeList(String category, String order, Integer limit);
+    List<AnilistResponseDto> getAnimeList(String category);
 
     // 상세 조회도 DTO로 변경
     AnilistResponseDto getAnime(Long id);

@@ -3,6 +3,7 @@ package com.aniping.anipingapp.animation.controller;
 
 import com.aniping.anipingapp.animation.dto.AnilistResponseDto;
 import com.aniping.anipingapp.animation.service.AnimeService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,12 +18,9 @@ public class AnimeController {
 
     //애니 목록 조회
     @GetMapping
-    public List<AnilistResponseDto> getAnimeList(
-            @RequestParam(required = false) String category,
-            @RequestParam(required = false) String order,
-            @RequestParam(required = false) Integer limit
+    public List<AnilistResponseDto> getAnimeList(@Valid @RequestParam String category
     ) {
-        return animeService.getAnimeList(category, order, limit);
+        return animeService.getAnimeList(category);
     }
 
     //애니 상세 조회

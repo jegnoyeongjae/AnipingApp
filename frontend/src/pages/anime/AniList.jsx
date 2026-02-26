@@ -20,13 +20,19 @@ const AniList = () => {
     sf: "SF",
     normal: "일상",
   };
-
+  console.log(category);
   useEffect(() => {
     const orderParam = sortType === "popular" ? "likes" : "";
-    axios.get(`http://localhost:8080/api/anime?category=${category}&order=${orderParam}`)
+    axios.get(`http://localhost:8080/api/anime`,{
+        params: {
+              category: category, // 'fantasy' 등
+             // order: orderParam,   // 'likes' 또는 'latest'
+            }})
       .then((res) => {
-        setAllItems(res.data);
-        setFilteredItems(res.data);
+          const data = res.data || [];
+          console.log(data);
+        setAllItems(data);
+        setFilteredItems(data);
       })
       .catch((err) => console.error("애니 목록 조회실패:", err));
   }, [category, sortType]);
@@ -40,7 +46,7 @@ const AniList = () => {
     setCurrentPage(1); // 정렬 변경 시 1페이지로
   }, [sortType, allItems]);
 
-  // Pagination Logic
+//   Pagination Logic
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
