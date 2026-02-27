@@ -1,14 +1,11 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { AdminAniLi } from "../../../components/admin/AdminAni";
 import { Clapperboard, PlusCircle } from 'lucide-react';
 import { Link } from "react-router-dom";
-import { Paging } from "../../../components/common/Paging";
 
 const AdminAni = () => {
     const [anis, setAnis] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(10);
 
     useEffect(() => {
         loadData();
@@ -17,12 +14,16 @@ const AdminAni = () => {
     const loadData = async () => {
         try {
             const response = await axios.get(`/api/AdminAni`);
-            setAnis(Array.isArray(response.data) ? response.data : []);
+            setAnis(response.data);
         } catch (e) {
             console.error("데이터 로드 실패:", e);
-            setAnis([]);
         }
     };
+
+    // 삭제 기능 추가 (AdminAniLi에서 호출할 수 있도록 props로 전달하거나, 여기서 처리)
+    // AdminAniLi는 Link로 감싸져 있지 않고 내부에서 navigate를 사용하므로, 
+    // 삭제 버튼 클릭 시 이벤트를 받아 처리하는 것이 좋음.
+    // 하지만 AdminAniLi 컴포넌트 구조상 props로 함수를 전달해야 함.
 
     const handleDeleteAni = async (id) => {
         if (!window.confirm("정말로 삭제하시겠습니까?")) return;
@@ -35,15 +36,6 @@ const AdminAni = () => {
             console.error(e);
         }
     };
-
-    // 페이징 로직
-    const currentItems = useMemo(() => {
-        const indexOfLastItem = currentPage * itemsPerPage;
-        const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-        return anis.slice(indexOfFirstItem, indexOfLastItem);
-    }, [anis, currentPage, itemsPerPage]);
-
-    const totalPages = Math.ceil(anis.length / itemsPerPage);
 
     return (
         <div className="min-h-screen bg-slate-50 p-8">
@@ -75,20 +67,15 @@ const AdminAni = () => {
                         <div className="col-span-2 text-center">Actions</div>
                     </div>
                     <ul className="divide-y divide-slate-100">
-                        {currentItems.map((ani, idx)=>
+                        {anis.map((ani, idx)=>
                             <AdminAniLi
-                                idx={(currentPage - 1) * itemsPerPage + idx + 1}
+                                idx={idx + 1}
                                 ani={ani}
                                 key={ani.id}
                                 onDelete={() => handleDeleteAni(ani.id)}
                             />
                         )}
                     </ul>
-                </div>
-
-                {/* 페이지네이션 */}
-                <div className="flex justify-center mt-8">
-                    <Paging page={currentPage} totalPage={totalPages} setPage={setCurrentPage} pageCount={10} />
                 </div>
             </div>
         </div>

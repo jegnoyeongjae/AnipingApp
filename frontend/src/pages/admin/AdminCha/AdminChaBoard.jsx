@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Search, UserPlus, CheckCircle, XCircle, Trash2 } from 'lucide-react';
-import { Paging } from "../../../components/common/Paging"; // Paging 컴포넌트 import
+import { Search, UserPlus, CheckCircle, XCircle, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const AdminChaBoard = () => {
     const [requests, setRequests] = useState([]);
@@ -136,10 +135,7 @@ const AdminChaBoard = () => {
 
                         <select 
                             value={itemsPerPage} 
-                            onChange={(e) => {
-                                setItemsPerPage(Number(e.target.value));
-                                setCurrentPage(1);
-                            }}
+                            onChange={(e) => setItemsPerPage(Number(e.target.value))}
                             className="px-4 py-3 rounded-xl bg-white border border-slate-200 text-sm font-bold text-slate-600 focus:outline-none focus:border-primary cursor-pointer"
                         >
                             <option value={10}>10개씩 보기</option>
@@ -163,7 +159,7 @@ const AdminChaBoard = () => {
                     <ul className="divide-y divide-slate-100">
                         {currentItems.map((req, idx) => (
                             <li key={req.id} className="grid grid-cols-12 gap-4 p-5 items-center hover:bg-slate-50/50 transition-colors text-center">
-                                <div className="col-span-1 text-slate-500 font-medium">{(currentPage - 1) * itemsPerPage + idx + 1}</div>
+                                <div className="col-span-1 text-slate-500 font-medium">{idx + 1}</div>
                                 <div className="col-span-3 text-left pl-4 font-bold text-slate-800">{req.name}</div>
                                 <div className="col-span-3 text-left text-slate-600">{req.animeTitle ? `${req.animeTitle}` : '시스템입력'}</div>
                                 <div className="col-span-2 text-slate-500 text-sm">{req.nickname ? `${req.nickname}` : '시스템입력'}</div>
@@ -199,10 +195,39 @@ const AdminChaBoard = () => {
                     )}
                 </div>
 
-                {/* 페이지네이션 컴포넌트 사용 */}
-                <div className="flex justify-center mt-8">
-                    <Paging page={currentPage} totalPage={totalPages} setPage={setCurrentPage} pageCount={10} />
-                </div>
+                {/* 페이지네이션 */}
+                {totalPages > 1 && (
+                    <div className="flex justify-center gap-2 mt-8">
+                        <button 
+                            onClick={() => handlePageChange(currentPage - 1)}
+                            disabled={currentPage === 1}
+                            className="p-2 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                            <ChevronLeft size={20} />
+                        </button>
+                        
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                            <button
+                                key={page}
+                                onClick={() => handlePageChange(page)}
+                                className={`w-10 h-10 rounded-lg font-bold text-sm transition-all
+                                    ${currentPage === page 
+                                    ? 'bg-primary text-white shadow-md scale-105' 
+                                    : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}
+                            >
+                                {page}
+                            </button>
+                        ))}
+
+                        <button 
+                            onClick={() => handlePageChange(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                            className="p-2 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                            <ChevronRight size={20} />
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );

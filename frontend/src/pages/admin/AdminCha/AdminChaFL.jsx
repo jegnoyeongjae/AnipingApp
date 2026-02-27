@@ -1,8 +1,7 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { AdminChaFLLi } from "../../../components/admin/AdminCha";
-import { Quote, Search } from 'lucide-react';
-import { Paging } from "../../../components/common/Paging"; // Paging 컴포넌트 import
+import { Quote, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const AdminChaFL = () => {
     const [chaFLs, setChaFLs] = useState([]);
@@ -17,13 +16,10 @@ const AdminChaFL = () => {
     const loadData = async () => {
         try {
             const response = await axios.get('/api/AdminChaFL');
-            const data = Array.isArray(response.data) ? response.data : [];
-            setChaFLs(data);
-            setFilteredChaFLs(data);
+            setChaFLs(response.data);
+            setFilteredChaFLs(response.data);
         } catch (e) {
             console.error("데이터 로딩 실패:", e);
-            setChaFLs([]);
-            setFilteredChaFLs([]);
         }
     };
 
@@ -33,10 +29,11 @@ const AdminChaFL = () => {
 
     // 필터링 로직
     useEffect(() => {
-        let result = [...chaFLs];
+        let result = chaFLs;
 
         if (searchTerm) {
             result = result.filter(item =>
+                // title 대신 charName, user 대신 userNickname 사용
                 (item.charName && item.charName.toLowerCase().includes(searchTerm.toLowerCase())) ||
                 (item.content && item.content.toLowerCase().includes(searchTerm.toLowerCase())) ||
                 (item.userNickname && item.userNickname.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -44,6 +41,7 @@ const AdminChaFL = () => {
         }
 
         if (statusFilter !== 'all') {
+            // status 대신 active 사용
             result = result.filter(item => item.active === statusFilter);
         }
 
@@ -52,13 +50,14 @@ const AdminChaFL = () => {
     }, [chaFLs, searchTerm, statusFilter]);
 
     // 페이지네이션 로직
-    const currentItems = useMemo(() => {
-        const indexOfLastItem = currentPage * itemsPerPage;
-        const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-        return filteredChaFLs.slice(indexOfFirstItem, indexOfLastItem);
-    }, [filteredChaFLs, currentPage, itemsPerPage]);
-
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = filteredChaFLs.slice(indexOfFirstItem, indexOfLastItem);
     const totalPages = Math.ceil(filteredChaFLs.length / itemsPerPage);
+
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
 
     // 액션 핸들러
     const handleApprove = async (id) => {
@@ -137,10 +136,7 @@ const AdminChaFL = () => {
                         </select>
                         <select 
                             value={itemsPerPage} 
-                            onChange={(e) => {
-                                setItemsPerPage(Number(e.target.value));
-                                setCurrentPage(1);
-                            }}
+                            onChange={(e) => setItemsPerPage(Number(e.target.value))}
                             className="px-4 py-3 rounded-xl bg-white border border-slate-200 text-sm font-bold text-slate-600 focus:outline-none focus:border-primary cursor-pointer"
                         >
                             <option value={10}>10개씩 보기</option>
@@ -180,10 +176,39 @@ const AdminChaFL = () => {
                     </ul>
                 </div>
 
-                {/* 페이지네이션 컴포넌트 사용 */}
-                <div className="flex justify-center mt-8">
-                    <Paging page={currentPage} totalPage={totalPages} setPage={setCurrentPage} />
-                </div>
+                {/* 페이지네이션 */}
+                {totalPages > 1 && (
+                    <div className="flex justify-center gap-2 mt-8">
+                        <button
+                            onClick={() => handlePageChange(currentPage - 1)}
+                            disabled={currentPage === 1}
+                            className="p-2 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                            <ChevronLeft size={20} />
+                        </button>
+                        
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                            <button
+                                key={page}
+                                onClick={() => handlePageChange(page)}
+                                className={`w-10 h-10 rounded-lg font-bold text-sm transition-all
+                                    ${currentPage === page 
+                                    ? 'bg-primary text-white shadow-md scale-105' 
+                                    : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}
+                            >
+                                {page}
+                            </button>
+                        ))}
+
+                        <button 
+                            onClick={() => handlePageChange(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                            className="p-2 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                            <ChevronRight size={20} />
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );

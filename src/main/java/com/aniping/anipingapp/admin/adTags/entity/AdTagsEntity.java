@@ -2,7 +2,6 @@ package com.aniping.anipingapp.admin.adTags.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.context.annotation.Configuration;
 
 @Entity
 @Table(name = "category")
@@ -14,7 +13,7 @@ public class AdTagsEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id; // @Column(name = "cateId") 제거
+    private int id; // @Column(name = "cateId") 가 없는 것을 다시 확인
 
     @Column(unique = true, nullable = false, length = 50)
     private String name;
