@@ -13,9 +13,8 @@ import org.springframework.context.annotation.Configuration;
 public class AdTagsEntity {
 
     @Id
-    @Column(name = "cateId")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private int id; // @Column(name = "cateId") 제거
 
     @Column(unique = true, nullable = false, length = 50)
     private String name;

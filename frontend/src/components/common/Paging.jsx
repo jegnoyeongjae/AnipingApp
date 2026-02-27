@@ -1,7 +1,7 @@
 import './Paging.css';
 
-export const Paging = ({ page, totalPage, setPage }) => {
-  const pageCount = 5; // 한 번에 보여줄 페이지 번호 개수
+export const Paging = ({ page, totalPage, setPage, pageCount = 5 }) => {
+  // pageCount는 한 번에 보여줄 페이지 번호 개수 (기본값 5)
   const pageGroup = Math.ceil(page / pageCount); // 현재 페이지 그룹
 
   let lastPage = pageGroup * pageCount; // 현재 그룹의 마지막 페이지

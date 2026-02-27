@@ -2,7 +2,27 @@ spring:
   application:
     name: AnipingApp
   config:
-    import: optional:classpath:secret.properties
+    import: "optional:classpath:secret.properties"
+  datasource:
+    url: jdbc:mysql://3.36.75.243:3307/aniping?allowPublicKeyRetrieval=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
+    username: root
+    password: ${db.password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      host: 3.36.75.243
+      port: 6379
+  jpa:
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+    defer-datasource-initialization: true
   security:
     oauth2:
       client:
@@ -35,23 +55,26 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
-
-  datasource:
-    url: jdbc:mysql://3.36.75.243:3307/aniping?allowPublicKeyRetrieval=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
-    username: root
-    password: ${db.password}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  jpa:
-    hibernate:
-      ddl-auto: none
-      naming:
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-      format_sql: true
-    show-sql: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: dbtmzp1@gmail.com
+    password: ${google.mail.password}
+    address: dbtmzp1@gmail.com
+    personal: aniping
     properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
-    defer-datasource-initialization: true
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+          ssl:
+            trust: smtp.gmail.com
+    auth-code-expiration-millis: 1800000
   cloud:
     aws:
       credentials:
@@ -63,31 +86,7 @@ spring:
         bucket: anipingapp-imagestorege
       stack:
         auto: false
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: dbtmzp1@gmail.com
-    password: ${google.mail.password}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-            required: true
-          connectiontimeout: 5000
-          timeout: 5000
-          writetimeout: 5000
-      hibernate:
-        format_sql: true
-    auth-code-expiration-millis: 1800000
-    jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    defer-datasource-initialization: true
   servlet:
     multipart:
       max-file-size: 10MB
       max-request-size: 50MB
-

@@ -1,7 +1,7 @@
 package com.aniping.anipingapp.global.headerCategory.controller;
 
-import com.aniping.anipingapp.global.headerCategory.entity.Category;
-import com.aniping.anipingapp.global.headerCategory.service.HeaderCategoryService;
+import com.aniping.anipingapp.admin.adTags.dto.AdTagsDto;
+import com.aniping.anipingapp.admin.adTags.service.AdTagsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,10 +15,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HeaderCategoryController {
 
-    private final HeaderCategoryService headerCategoryService;
+    private final AdTagsService adTagsService;
 
     @GetMapping
-    public ResponseEntity<List<Category>> getCategories() {
-        return ResponseEntity.ok(headerCategoryService.getAllCategories());
+    public ResponseEntity<List<AdTagsDto>> getCategories() {
+        return ResponseEntity.ok(adTagsService.findAllTags());
     }
 }
