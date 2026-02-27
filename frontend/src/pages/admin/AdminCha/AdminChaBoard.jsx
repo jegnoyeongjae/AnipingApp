@@ -1,54 +1,50 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Search, UserPlus, CheckCircle, XCircle, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, UserPlus, CheckCircle, XCircle, Trash2 } from 'lucide-react';
+import { Paging } from "../../../components/common/Paging";
 
 const AdminChaBoard = () => {
-    const [requests, setRequests] = useState([]);
-    const [filteredRequests, setFilteredRequests] = useState([]);
+    const [requestsPage, setRequestsPage] = useState(null);
     
     // Filter & Pagination States
     const [searchTerm, setSearchTerm] = useState('');
-    const [statusFilter, setStatusFilter] = useState('all'); // 상태 필터 추가
+    const [statusFilter, setStatusFilter] = useState('all');
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
 
-    const loadData = async () => {
+    const loadData = async (page, size, keyword, status) => {
         try {
-            const response = await axios.get('/api/AdminChaBoard');
-            setRequests(response.data);
-            setFilteredRequests(response.data);
+            const params = {
+                page: page - 1, // 백엔드는 0부터 시작
+                size: size,
+                keyword: keyword,
+                status: status === 'all' ? null : status
+            };
+            const response = await axios.get('/api/AdminChaBoard', { params });
+            setRequestsPage(response.data);
         } catch (e) {
             console.error("데이터 로딩 실패:", e);
         }
     };
 
     useEffect(() => {
-        loadData();
-    }, []);
+        loadData(currentPage, itemsPerPage, searchTerm, statusFilter);
+    }, [currentPage, itemsPerPage, statusFilter]); // searchTerm은 검색 버튼이나 엔터 칠 때 처리하는 게 좋지만, 여기선 입력 시 바로 반영하려면 추가
 
-    useEffect(() => {
-        let result = requests;
-
-        if (searchTerm) {
-            result = result.filter(req =>
-                req.name.toLowerCase().includes(searchTerm.toLowerCase())
-            );
+    // 검색 핸들러 (엔터 키 또는 검색 버튼 클릭 시)
+    const handleSearch = (e) => {
+        if (e.key === 'Enter' || e.type === 'click') {
+            setCurrentPage(1);
+            loadData(1, itemsPerPage, searchTerm, statusFilter);
         }
-
-        if (statusFilter !== 'all') {
-            result = result.filter(req => req.active === statusFilter);
-        }
-
-        setFilteredRequests(result);
-        setCurrentPage(1);
-    }, [requests, searchTerm, statusFilter]);
+    };
 
     const handleApprove = async (id) => {
         if (confirm('이 캐릭터 신청을 승인하시겠습니까?')) {
             try {
                 await axios.patch(`/api/AdminChaBoard/${id}/approve`);
                 alert("승인되었습니다.");
-                loadData();
+                loadData(currentPage, itemsPerPage, searchTerm, statusFilter);
             } catch (e) {
                 alert("승인 실패");
             }
@@ -59,9 +55,8 @@ const AdminChaBoard = () => {
         if (confirm('이 캐릭터 신청을 거절하시겠습니까?')) {
             try {
                 await axios.patch(`/api/AdminChaBoard/${id}/reject`);
-
                 alert("거절 처리되었습니다.");
-                loadData();
+                loadData(currentPage, itemsPerPage, searchTerm, statusFilter);
             } catch (e) {
                 console.error("거절 실패:", e);
                 alert("거절 처리 중 오류가 발생했습니다.");
@@ -74,21 +69,12 @@ const AdminChaBoard = () => {
             try {
                 await axios.delete(`/api/AdminChaBoard/${id}`);
                 alert("삭제되었습니다.");
-                loadData();
+                loadData(currentPage, itemsPerPage, searchTerm, statusFilter);
             } catch (e) {
                 alert("삭제 실패");
             }
         }
     };
-
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-
-    const currentItems = Array.isArray(filteredRequests)
-        ? filteredRequests.slice(indexOfFirstItem, indexOfLastItem)
-        : [];
-
-    const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
 
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
@@ -114,9 +100,10 @@ const AdminChaBoard = () => {
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                         <input 
                             type="text" 
-                            placeholder="캐릭터명 또는 애니명 검색..." 
+                            placeholder="캐릭터명, 애니명, 유저명 검색..." 
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
+                            onKeyDown={handleSearch}
                             className="w-full pl-12 pr-4 py-3 rounded-xl bg-white border border-slate-200 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium text-sm"
                         />
                     </div>
@@ -124,7 +111,10 @@ const AdminChaBoard = () => {
                     <div className="flex gap-3 w-full md:w-auto">
                         <select 
                             value={statusFilter} 
-                            onChange={(e) => setStatusFilter(e.target.value)}
+                            onChange={(e) => {
+                                setStatusFilter(e.target.value);
+                                setCurrentPage(1);
+                            }}
                             className="px-4 py-3 rounded-xl bg-white border border-slate-200 text-sm font-bold text-slate-600 focus:outline-none focus:border-primary cursor-pointer"
                         >
                             <option value="all">모든 상태</option>
@@ -135,7 +125,10 @@ const AdminChaBoard = () => {
 
                         <select 
                             value={itemsPerPage} 
-                            onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                            onChange={(e) => {
+                                setItemsPerPage(Number(e.target.value));
+                                setCurrentPage(1);
+                            }}
                             className="px-4 py-3 rounded-xl bg-white border border-slate-200 text-sm font-bold text-slate-600 focus:outline-none focus:border-primary cursor-pointer"
                         >
                             <option value={10}>10개씩 보기</option>
@@ -157,12 +150,14 @@ const AdminChaBoard = () => {
                     </div>
 
                     <ul className="divide-y divide-slate-100">
-                        {currentItems.map((req, idx) => (
+                        {requestsPage && requestsPage.content && requestsPage.content.map((req, idx) => (
                             <li key={req.id} className="grid grid-cols-12 gap-4 p-5 items-center hover:bg-slate-50/50 transition-colors text-center">
-                                <div className="col-span-1 text-slate-500 font-medium">{idx + 1}</div>
+                                <div className="col-span-1 text-slate-500 font-medium">
+                                    {requestsPage.totalElements - ((currentPage - 1) * itemsPerPage + idx)}
+                                </div>
                                 <div className="col-span-3 text-left pl-4 font-bold text-slate-800">{req.name}</div>
-                                <div className="col-span-3 text-left text-slate-600">{req.animeTitle ? `${req.animeTitle}` : '시스템입력'}</div>
-                                <div className="col-span-2 text-slate-500 text-sm">{req.nickname ? `${req.nickname}` : '시스템입력'}</div>
+                                <div className="col-span-3 text-left text-slate-600">{req.animeTitle ? `${req.animeTitle}` : '-'}</div>
+                                <div className="col-span-2 text-slate-500 text-sm">{req.nickname ? `${req.nickname}` : '-'}</div>
                                 <div className="col-span-1 text-slate-400 text-sm">{req.createAt ? req.createAt.split('T')[0] : '-'}</div>
                                 <div className="col-span-2 flex items-center justify-center gap-2">
                                     {req.active === 'accept' && (
@@ -178,54 +173,30 @@ const AdminChaBoard = () => {
                                     )}
 
                                     {req.active === 'waiting' && (
-                                        <button onClick={() => handleApprove(req.id)} className="...">
+                                        <button onClick={() => handleApprove(req.id)} className="p-2 text-slate-400 hover:bg-green-100 hover:text-green-600 rounded-full transition-all" title="승인">
                                             <CheckCircle size={16} />
                                         </button>
                                     )}
-
+                                    
+                                    <button onClick={() => handleDelete(req.id)} className="p-2 text-slate-400 hover:bg-red-100 hover:text-red-500 rounded-full transition-all" title="삭제">
+                                        <Trash2 size={16} />
+                                    </button>
                                 </div>
                             </li>
                         ))}
                     </ul>
                     
-                    {currentItems.length === 0 && (
+                    {(!requestsPage || !requestsPage.content || requestsPage.content.length === 0) && (
                         <div className="p-10 text-center text-slate-400">
                             데이터가 없습니다.
                         </div>
                     )}
                 </div>
 
-                {/* 페이지네이션 */}
-                {totalPages > 1 && (
-                    <div className="flex justify-center gap-2 mt-8">
-                        <button 
-                            onClick={() => handlePageChange(currentPage - 1)}
-                            disabled={currentPage === 1}
-                            className="p-2 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                        >
-                            <ChevronLeft size={20} />
-                        </button>
-                        
-                        {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                            <button
-                                key={page}
-                                onClick={() => handlePageChange(page)}
-                                className={`w-10 h-10 rounded-lg font-bold text-sm transition-all
-                                    ${currentPage === page 
-                                    ? 'bg-primary text-white shadow-md scale-105' 
-                                    : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}
-                            >
-                                {page}
-                            </button>
-                        ))}
-
-                        <button 
-                            onClick={() => handlePageChange(currentPage + 1)}
-                            disabled={currentPage === totalPages}
-                            className="p-2 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                        >
-                            <ChevronRight size={20} />
-                        </button>
+                {/* 페이지네이션 컴포넌트 사용 */}
+                {requestsPage && requestsPage.totalPages > 0 && (
+                    <div className="flex justify-center mt-8">
+                        <Paging page={currentPage} totalPage={requestsPage.totalPages} setPage={handlePageChange} pageCount={10} />
                     </div>
                 )}
             </div>

@@ -1,5 +1,7 @@
 package com.aniping.anipingapp.admin.adCha.entity;
 
+import com.aniping.anipingapp.admin.adAni.entity.AdAniEntity;
+import com.aniping.anipingapp.user.entity.UserEntity;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -22,6 +24,10 @@ public class adChaEntity {
     @Column(name = "aniId")
     private Integer aniId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "aniId", insertable = false, updatable = false)
+    private AdAniEntity animation;
+
     @Column(name = "cvId")
     private Integer cvId;
 
@@ -37,6 +43,10 @@ public class adChaEntity {
 
     @Column(name = "userId")
     private Integer userId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId", insertable = false, updatable = false)
+    private UserEntity user;
 
     @CreationTimestamp
     @Column(name = "createAt", updatable = false)

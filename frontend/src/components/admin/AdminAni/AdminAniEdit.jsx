@@ -93,21 +93,14 @@ const AdminAniEdit = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const dataToSend = {
-            ...formData,
-            cateId: parseInt(formData.cateId)
-        };
-        await axios.post('/api/AdminAni', dataToSend);
         
         try {
             let targetId = id;
             if (isEditing) {
                 await axios.put(`/api/AdminAni/${id}`, formData);
-                alert("수정되었습니다.");
             } else {
                 const response = await axios.post('/api/AdminAni', formData);
                 targetId = response.data.id; // DB에서 자동 생성된 ID (Primary Key)
-                alert("등록되었습니다.");
             }
 
             //메인 이미지
@@ -124,9 +117,6 @@ const AdminAniEdit = () => {
                     }
                 });
             }
-
-            alert(isEditing ? "수정되었습니다." : "등록되었습니다.");
-            + navigate('/AdminAni')
 
             // 캐릭터
             if (deletedCharIds.length > 0) {
@@ -158,10 +148,14 @@ const AdminAniEdit = () => {
                 }
             }
 
+            alert(isEditing ? "수정되었습니다." : "등록되었습니다.");
             navigate('/AdminAni');
+
         } catch (error) {
             console.error("저장 실패:", error);
-            alert(`저장 중 오류 발생: ${error.response?.data?.message || error.message}`);
+            // 에러 메시지 처리 강화
+            const errorMessage = error.response?.data || error.message || "저장 중 오류가 발생했습니다.";
+            alert(`저장 실패: ${errorMessage}`);
         }
     };
 

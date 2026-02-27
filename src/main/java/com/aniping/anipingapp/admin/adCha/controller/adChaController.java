@@ -3,6 +3,9 @@ package com.aniping.anipingapp.admin.adCha.controller;
 import com.aniping.anipingapp.admin.adCha.dto.adChaDto;
 import com.aniping.anipingapp.admin.adCha.service.AdChaService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,10 +38,13 @@ public class adChaController {
     }
 
     //characterBoard
-    // 조회
+    // 조회 (페이징 및 검색/필터 추가)
     @GetMapping
-    public ResponseEntity<List<adChaDto>> getAllRequests() {
-        return ResponseEntity.ok(adChaService.getAllRequests());
+    public ResponseEntity<Page<adChaDto>> getAllRequests(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String status,
+            @PageableDefault(size = 10, sort = "createAt", direction = org.springframework.data.domain.Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(adChaService.getAllRequests(keyword, status, pageable));
     }
 
     // 승인 처리

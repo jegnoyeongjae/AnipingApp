@@ -40,6 +40,11 @@ public class AdAniService {
 
     @Transactional
     public AdAniDto saveAni(AdAniDto dto) {
+        // 중복 체크 (신규 등록일 때만)
+        if (dto.getId() == null && adAniRepository.existsByTitle(dto.getTitle())) {
+            throw new IllegalArgumentException("이미 존재하는 애니메이션 제목입니다: " + dto.getTitle());
+        }
+
         AdAniEntity entity = dto.toEntity();
 
         if (entity.getId() == null) {
@@ -56,6 +61,11 @@ public class AdAniService {
     public void updateAni(Integer id, AdAniDto dto) {
         AdAniEntity ani = adAniRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 애니메이션이 없습니다."));
+        
+        // 제목 변경 시 중복 체크 (자신의 제목은 제외)
+        if (!ani.getTitle().equals(dto.getTitle()) && adAniRepository.existsByTitle(dto.getTitle())) {
+            throw new IllegalArgumentException("이미 존재하는 애니메이션 제목입니다: " + dto.getTitle());
+        }
 
         ani.setTitle(dto.getTitle());
         ani.setDirector(dto.getDirector());

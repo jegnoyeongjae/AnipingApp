@@ -13,6 +13,8 @@ import com.aniping.anipingapp.global.file.entity.File;
 import com.aniping.anipingapp.global.file.repository.FileRepository;
 import com.aniping.anipingapp.global.file.service.FileService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -110,22 +112,18 @@ public class AdChaService {
     }
 
     //characterBoard
-    public List<adChaDto> getAllRequests() {
-        return adChaRepo.findAll().stream()
+    public Page<adChaDto> getAllRequests(String keyword, String status, Pageable pageable) {
+        return adChaRepo.findWithFilters(keyword, status, pageable)
                 .map(entity -> {
                     adChaDto dto = convertToDto(entity);
-                    if (entity.getUserId() != null) {
-                        userRepository.findById(entity.getUserId())
-                                .ifPresent(user -> dto.setNickname(user.getNickname()));
+                    if (entity.getUser() != null) {
+                        dto.setNickname(entity.getUser().getNickname());
                     }
-                    if (entity.getAniId() != null) {
-                        adAniRepo.findById(entity.getAniId())
-                                .map(AdAniDto::fromEntity)
-                                .ifPresent(aniDto -> dto.setAnimeTitle(aniDto.getTitle()));
+                    if (entity.getAnimation() != null) {
+                        dto.setAnimeTitle(entity.getAnimation().getTitle());
                     }
                     return dto;
-                })
-                .collect(Collectors.toList());
+                });
     }
 
     //승인

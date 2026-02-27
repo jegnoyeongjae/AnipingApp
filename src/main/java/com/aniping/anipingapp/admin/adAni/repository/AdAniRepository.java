@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface AdAniRepository extends JpaRepository<AdAniEntity, Integer> {
     List<AdAniEntity> findAllByDeleteAtIsNull();
     Optional<AdAniEntity> findByIdAndDeleteAtIsNull(Integer id);
+    boolean existsByTitle(String title);
 }
