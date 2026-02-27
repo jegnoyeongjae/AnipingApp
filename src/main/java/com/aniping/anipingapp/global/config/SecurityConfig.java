@@ -43,6 +43,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/board/**").permitAll()
+                        // Preflight 요청 허용
+                        //.requestMatchers(HttpMethod.OPTIONS, "/**").hasRole("admin")
                         .requestMatchers(
                                 "/",
                                 "/index.html",
@@ -62,7 +64,7 @@ public class SecurityConfig {
                                 "/api/email/**",
                                 "/api/header/categories" // 카테고리 조회 API 허용
                         ).permitAll()
-                        .requestMatchers("/api/admin/**", "/api/AdUserLi/**", "/api/AdCuSeAsk/**", "/api/AdFAQ/**", "/api/AdminAni/**", "/api/AdminAniLiEd/**", "/api/AdminNotice/**","/api/AdminAni/tag/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**", "/api/AdUserLi/**", "/api/AdCuSeAsk/**", "/api/AdFAQ/**", "/api/AdminAni/**", "/api/AdminAniLiEd/**", "/api/AdminNotice/**","/api/AdminAni/tag/**", "/api/AdminChaBoard/**","/api/AdminChaFL/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 
@@ -105,6 +107,7 @@ public class SecurityConfig {
         configuration.setAllowedHeaders(Collections.singletonList("*"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
+
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

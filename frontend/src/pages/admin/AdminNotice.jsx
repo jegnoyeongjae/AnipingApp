@@ -94,12 +94,14 @@ const AdminNotice = () => {
         }
     };
 
+
     const handleSave = async () => {
         const currentUserId = userInfo?.id || userInfo?.userId;
 
         if (!editForm.title.trim() || !editForm.content.trim()) {
             alert('제목과 내용을 모두 입력해주세요.');
             return;
+
         }
 
         if (!currentUserId) {

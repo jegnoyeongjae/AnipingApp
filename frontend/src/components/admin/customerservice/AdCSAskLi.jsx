@@ -1,13 +1,14 @@
 import { useState } from "react";
 import axios from "axios";
 import { ChevronDown, CheckCircle, MessageSquare, Save } from 'lucide-react';
-import { useUser } from '../../../context/UserContext'; // useUser import
+import { useUser } from "../../../context/UserContext";
+
 
 const AdCSAskLi = ({ userAsks, userAsk, idx, setUserAsks }) => {
-    const { userInfo } = useUser(); // UserContext에서 userInfo 가져오기
     const [isVisible, setIsVisible] = useState(false);
     const [ansTitleInput, setAnsTitleInput] = useState('');
     const [ansInput, setAnsInput] = useState('');
+    const { userInfo } = useUser();
 
     const visibleContent = () => {
         setIsVisible(!isVisible);
@@ -27,19 +28,20 @@ const AdCSAskLi = ({ userAsks, userAsk, idx, setUserAsks }) => {
             return;
         }
 
-        // UserContext에서 관리자 정보 확인
+
+
         if (!userInfo || !userInfo.id) {
             alert("관리자 로그인 정보가 없습니다.");
             return;
         }
 
         try{
-            // API 호출 (경로는 백엔드 구현에 따라 다를 수 있음, 현재는 기존 코드 유지)
-            // 백엔드에서 adminId를 받을 수 있도록 DTO나 파라미터 수정이 필요할 수 있음
+
             const response = await axios.put(`/api/AdCuSeAsk/Edit/${userAsk.id}`, {
                 ansTitle: ansTitleInput,
                 ansContent: ansInput,
-                adminId: userInfo.id // userInfo.id 사용
+                adminId: userInfo.id
+
             });
             
             if (response.status === 200) {

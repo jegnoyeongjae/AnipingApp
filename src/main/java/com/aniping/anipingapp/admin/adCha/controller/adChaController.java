@@ -1,0 +1,57 @@
+package com.aniping.anipingapp.admin.adCha.controller;
+
+import com.aniping.anipingapp.admin.adCha.dto.adChaDto;
+import com.aniping.anipingapp.admin.adCha.service.AdChaService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/AdminChaBoard")
+@RequiredArgsConstructor
+public class adChaController {
+    private final AdChaService adChaService;
+
+    @PostMapping
+    public ResponseEntity<adChaDto> createCharacter(@RequestBody adChaDto dto) {
+        adChaDto savedDto = adChaService.saveCharacter(dto);
+        return ResponseEntity.ok(savedDto);
+    }
+
+    // 특정 애니메이션 ID로 캐릭터 리스트 조회
+    @GetMapping("/ani/{aniId}")
+    public ResponseEntity<List<adChaDto>> getCharactersByAni(@PathVariable Integer aniId) {
+        List<adChaDto> list = adChaService.getCharactersByAniId(aniId);
+        return ResponseEntity.ok(list);
+    }
+
+    //삭제
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCharacter(@PathVariable Integer id) {
+        adChaService.deleteCharacter(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    //characterBoard
+    // 조회
+    @GetMapping
+    public ResponseEntity<List<adChaDto>> getAllRequests() {
+        return ResponseEntity.ok(adChaService.getAllRequests());
+    }
+
+    // 승인 처리
+    @PatchMapping("/{id}/approve")
+    public ResponseEntity<Void> approveCharacter(@PathVariable Integer id) {
+        adChaService.approveCharacter(id);
+        return ResponseEntity.ok().build();
+    }
+
+    //거절
+    @PatchMapping("/{id}/reject")
+    public ResponseEntity<Void> rejectCharacter(@PathVariable Integer id) {
+        adChaService.rejectCharacter(id);
+        return ResponseEntity.ok().build();
+    }
+}

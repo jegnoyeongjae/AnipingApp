@@ -12,83 +12,86 @@ const AdminChaBoard = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
 
+    const loadData = async () => {
+        try {
+            const response = await axios.get('/api/AdminChaBoard');
+            setRequests(response.data);
+            setFilteredRequests(response.data);
+        } catch (e) {
+            console.error("데이터 로딩 실패:", e);
+        }
+    };
+
     useEffect(() => {
-        const loadData = async () => {
-            const storedRequests = localStorage.getItem('admin_chaRequests');
-            if (storedRequests) {
-                const data = JSON.parse(storedRequests);
-                setRequests(data);
-                setFilteredRequests(data);
-            } else {
-                try {
-                    const response = await axios.get('/data/adminChaRequest.json');
-                    setRequests(response.data);
-                    setFilteredRequests(response.data);
-                    localStorage.setItem('admin_chaRequests', JSON.stringify(response.data));
-                } catch (e) {
-                    console.error(e);
-                }
-            }
-        };
         loadData();
     }, []);
 
-    // 필터링 로직
     useEffect(() => {
         let result = requests;
 
-        // 검색어 필터
         if (searchTerm) {
-            result = result.filter(req => 
-                req.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                req.anime.toLowerCase().includes(searchTerm.toLowerCase())
+            result = result.filter(req =>
+                req.name.toLowerCase().includes(searchTerm.toLowerCase())
             );
         }
 
-        // 상태 필터
         if (statusFilter !== 'all') {
-            result = result.filter(req => req.status === statusFilter);
+            result = result.filter(req => req.active === statusFilter);
         }
 
         setFilteredRequests(result);
         setCurrentPage(1);
     }, [requests, searchTerm, statusFilter]);
 
-    // 페이지네이션 로직
+    const handleApprove = async (id) => {
+        if (confirm('이 캐릭터 신청을 승인하시겠습니까?')) {
+            try {
+                await axios.patch(`/api/AdminChaBoard/${id}/approve`);
+                alert("승인되었습니다.");
+                loadData();
+            } catch (e) {
+                alert("승인 실패");
+            }
+        }
+    };
+
+    const handleReject = async (id) => {
+        if (confirm('이 캐릭터 신청을 거절하시겠습니까?')) {
+            try {
+                await axios.patch(`/api/AdminChaBoard/${id}/reject`);
+
+                alert("거절 처리되었습니다.");
+                loadData();
+            } catch (e) {
+                console.error("거절 실패:", e);
+                alert("거절 처리 중 오류가 발생했습니다.");
+            }
+        }
+    };
+
+    const handleDelete = async (id) => {
+        if (confirm('정말 삭제하시겠습니까?')) {
+            try {
+                await axios.delete(`/api/AdminChaBoard/${id}`);
+                alert("삭제되었습니다.");
+                loadData();
+            } catch (e) {
+                alert("삭제 실패");
+            }
+        }
+    };
+
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredRequests.slice(indexOfFirstItem, indexOfLastItem);
+
+    const currentItems = Array.isArray(filteredRequests)
+        ? filteredRequests.slice(indexOfFirstItem, indexOfLastItem)
+        : [];
+
     const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
 
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
-    };
-
-    // 액션 핸들러
-    const handleApprove = (id) => {
-        if (confirm('이 캐릭터 신청을 승인하시겠습니까?')) {
-            const updatedRequests = requests.map(req => 
-                req.id === id ? { ...req, status: 'registered' } : req
-            );
-            setRequests(updatedRequests);
-            localStorage.setItem('admin_chaRequests', JSON.stringify(updatedRequests));
-        }
-    };
-
-    const handleReject = (id) => {
-        if (confirm('이 캐릭터 신청을 거절하시겠습니까? (목록에서 삭제됩니다)')) {
-            const updatedRequests = requests.filter(req => req.id !== id);
-            setRequests(updatedRequests);
-            localStorage.setItem('admin_chaRequests', JSON.stringify(updatedRequests));
-        }
-    };
-
-    const handleDelete = (id) => {
-        if (confirm('등록된 캐릭터를 삭제하시겠습니까?')) {
-            const updatedRequests = requests.filter(req => req.id !== id);
-            setRequests(updatedRequests);
-            localStorage.setItem('admin_chaRequests', JSON.stringify(updatedRequests));
-        }
     };
 
     return (
@@ -125,8 +128,9 @@ const AdminChaBoard = () => {
                             className="px-4 py-3 rounded-xl bg-white border border-slate-200 text-sm font-bold text-slate-600 focus:outline-none focus:border-primary cursor-pointer"
                         >
                             <option value="all">모든 상태</option>
-                            <option value="registered">등록완료</option>
-                            <option value="pending">신청대기</option>
+                            <option value="accept">등록완료</option>
+                            <option value="waiting">신청대기</option>
+                            <option value="reject">거절됨</option>
                         </select>
 
                         <select 
@@ -155,46 +159,30 @@ const AdminChaBoard = () => {
                     <ul className="divide-y divide-slate-100">
                         {currentItems.map((req, idx) => (
                             <li key={req.id} className="grid grid-cols-12 gap-4 p-5 items-center hover:bg-slate-50/50 transition-colors text-center">
-                                <div className="col-span-1 text-slate-500 font-medium">{req.id}</div>
+                                <div className="col-span-1 text-slate-500 font-medium">{idx + 1}</div>
                                 <div className="col-span-3 text-left pl-4 font-bold text-slate-800">{req.name}</div>
-                                <div className="col-span-3 text-left text-slate-600">{req.anime}</div>
-                                <div className="col-span-2 text-slate-500 text-sm">{req.user}</div>
-                                <div className="col-span-1 text-slate-400 text-sm">{req.date}</div>
+                                <div className="col-span-3 text-left text-slate-600">{req.animeTitle ? `${req.animeTitle}` : '시스템입력'}</div>
+                                <div className="col-span-2 text-slate-500 text-sm">{req.nickname ? `${req.nickname}` : '시스템입력'}</div>
+                                <div className="col-span-1 text-slate-400 text-sm">{req.createAt ? req.createAt.split('T')[0] : '-'}</div>
                                 <div className="col-span-2 flex items-center justify-center gap-2">
-                                    {req.status === 'registered' ? (
-                                        <>
-                                            <span className="flex items-center gap-1 text-xs font-bold text-green-600 bg-green-100 px-2.5 py-1 rounded-full mr-2">
-                                                <CheckCircle size={12} /> 등록완료
-                                            </span>
-                                            <button 
-                                                onClick={() => handleDelete(req.id)}
-                                                className="p-2 text-slate-400 hover:bg-red-100 hover:text-red-500 rounded-full transition-colors"
-                                                title="삭제"
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <span className="flex items-center gap-1 text-xs font-bold text-orange-600 bg-orange-100 px-2.5 py-1 rounded-full mr-2">
-                                                신청대기
-                                            </span>
-                                            <button 
-                                                onClick={() => handleApprove(req.id)}
-                                                className="p-2 text-slate-400 hover:bg-green-100 hover:text-green-600 rounded-full transition-colors"
-                                                title="승인"
-                                            >
-                                                <CheckCircle size={16} />
-                                            </button>
-                                            <button 
-                                                onClick={() => handleReject(req.id)}
-                                                className="p-2 text-slate-400 hover:bg-red-100 hover:text-red-500 rounded-full transition-colors"
-                                                title="거절"
-                                            >
-                                                <XCircle size={16} />
-                                            </button>
-                                        </>
+                                    {req.active === 'accept' && (
+                                        <span className="flex items-center gap-1 text-xs font-bold text-green-600 bg-green-100 px-2.5 py-1 rounded-full">
+                                            <CheckCircle size={12} /> 등록완료
+                                        </span>
                                     )}
+
+                                    {req.active === 'reject' && (
+                                        <span className="flex items-center gap-1 text-xs font-bold text-red-600 bg-red-100 px-2.5 py-1 rounded-full">
+                                            <XCircle size={12} /> 거절됨
+                                        </span>
+                                    )}
+
+                                    {req.active === 'waiting' && (
+                                        <button onClick={() => handleApprove(req.id)} className="...">
+                                            <CheckCircle size={16} />
+                                        </button>
+                                    )}
+
                                 </div>
                             </li>
                         ))}

@@ -1,12 +1,11 @@
 package com.aniping.anipingapp.admin.adAni.entity;
 
 import com.aniping.anipingapp.admin.adTags.entity.AdTagsEntity;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.Entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -42,17 +41,21 @@ public class AdAniEntity {
 
     @Column(name = "aniPv", columnDefinition = "TEXT")
     private String aniPv;
-
+    
+    @Builder.Default
     @Column(name = "viewCount")
     private Integer viewCount = 0;
 
+    @Builder.Default
     @Column(name = "likes")
     private Integer likes = 0;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cateId",referencedColumnName = "cateId" ,insertable = false, updatable = false)
-    @JsonIgnore
+    @JoinColumn(name = "cateId", insertable = false, updatable = false)
     private AdTagsEntity category;
+    
+    @Column(name = "cateId")
+    private Integer cateId;
 
     @CreationTimestamp
     @Column(name = "createAt", updatable = false)

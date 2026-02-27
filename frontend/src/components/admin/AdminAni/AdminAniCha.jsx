@@ -1,40 +1,62 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Upload, ImageIcon } from 'lucide-react';
+import axios from 'axios';
 
-const AdminAniCha = ({ characters, setCharacters }) => {
+const AdminAniCha = ({ characters, setCharacters, onDelete }) => {
     const [voiceActors, setVoiceActors] = useState([]); // 성우 목록
 
     useEffect(() => {
-        // 성우 목록 로드 (가상의 API)
-        // axios.get('/api/voice-actors').then(res => setVoiceActors(res.data));
-        setVoiceActors([
-            { id: 1, name: '성우1' },
-            { id: 2, name: '성우2' },
-            { id: 3, name: '성우3' },
-        ]);
+        axios.get('/api/AdminVA')
+            .then(res => {
+                setVoiceActors(res.data);
+            })
+            .catch(err => console.error("성우 목록 로딩 실패:", err));
     }, []);
 
     const addCharacter = () => {
-        setCharacters([...characters, { id: Date.now(), name: '', cvId: '', image: null, previewUrl: null, isNew: true }]);
+        setCharacters([...characters, {
+            id: null, // DB ID는 null로!
+            tempId: Date.now(), // 리액트 key용 임시 ID
+            name: '',
+            cvId: '',
+            image: null,
+            previewUrl: null
+        }]);
     };
 
-    const removeCharacter = (id) => {
+    const handleFieldChange = (target, field, value) => {
+        setCharacters(characters.map(char => {
+            const isMatch = char.id ? char.id === target.id : char.tempId === target.tempId;
+            return isMatch ? { ...char, [field]: value } : char;
+        }));
+    };
+
+    const removeCharacter = (char) => {
         if (window.confirm("캐릭터를 삭제하시겠습니까?")) {
-            setCharacters(characters.filter(char => char.id !== id));
+            if (char.id) {
+                onDelete(char.id);
+            }
+            setCharacters(characters.filter(c =>
+                char.id ? c.id !== char.id : c.tempId !== char.tempId
+            ));
         }
     };
 
-    const handleInputChange = (id, field, value) => {
-        setCharacters(characters.map(char => 
-            char.id === id ? { ...char, [field]: value } : char
-        ));
+    const handleInputChange = (targetChar, field, value) => {
+        setCharacters(prev => prev.map(char => {
+            const isMatch = targetChar.id
+                ? char.id === targetChar.id
+                : char.tempId === targetChar.tempId;
+
+            return isMatch ? { ...char, [field]: value } : char;
+        }));
     };
 
     const handleImageChange = (id, e) => {
         const file = e.target.files[0];
         if (file) {
             const url = URL.createObjectURL(file);
-            setCharacters(characters.map(char => 
+            setCharacters(characters.map(char =>
                 char.id === id ? { ...char, image: file, previewUrl: url } : char
             ));
         }
@@ -51,8 +73,20 @@ const AdminAniCha = ({ characters, setCharacters }) => {
                     <div key={char.id} className="flex gap-4 items-start p-4 bg-slate-50 rounded-xl border border-slate-200">
                         {/* 이미지 업로드 */}
                         <div className="relative w-24 h-32 bg-white rounded-lg border border-slate-300 flex items-center justify-center overflow-hidden flex-shrink-0 group">
-                            {char.previewUrl ? (
-                                <img src={char.previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                            {char.previewUrl || char.image ? (
+                                <img
+                                    src={
+                                        char.previewUrl || // 1. 방금 파일 선택한 경우 (Blob URL)
+                                        char.image      || // 2. DB에서 가져온 경우 (S3 URL)
+                                        "/default-profile.png"
+                                    }
+                                    className="w-full h-full object-cover"
+                                    alt={char.name || "캐릭터 이미지"}
+                                    onError={(e) => {
+                                        console.log("이미지 로딩 실패 주소:", e.target.src);
+                                        e.target.src = "/default-profile.png";
+                                    }}
+                                />
                             ) : (
                                 <ImageIcon className="text-slate-300" />
                             )}
@@ -69,7 +103,7 @@ const AdminAniCha = ({ characters, setCharacters }) => {
                                 <input 
                                     type="text" 
                                     value={char.name} 
-                                    onChange={(e) => handleInputChange(char.id, 'name', e.target.value)}
+                                    onChange={(e) => handleInputChange(char, 'name', e.target.value)}
                                     className="w-full p-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-primary"
                                     placeholder="이름 입력"
                                 />
@@ -78,7 +112,7 @@ const AdminAniCha = ({ characters, setCharacters }) => {
                                 <label className="block text-xs font-bold text-slate-500 mb-1">성우 (CV)</label>
                                 <select 
                                     value={char.cvId} 
-                                    onChange={(e) => handleInputChange(char.id, 'cvId', e.target.value)}
+                                    onChange={(e) => handleInputChange(char, 'cvId', e.target.value)}
                                     className="w-full p-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-primary"
                                 >
                                     <option value="">성우 선택</option>
@@ -91,7 +125,7 @@ const AdminAniCha = ({ characters, setCharacters }) => {
 
                         {/* 삭제 버튼 */}
                         <button 
-                            onClick={() => removeCharacter(char.id)}
+                            onClick={() => removeCharacter(char)}
                             className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                         >
                             <Trash2 size={20} />
