@@ -40,7 +40,11 @@ const AniList = () => {
   useEffect(() => {
     let sorted = [...allItems];
     if (sortType === "latest") {
-      sorted.sort((a, b) => new Date(b.airdate) - new Date(a.airdate));
+      // date 필드가 LocalDate 타입이므로, 문자열로 비교하거나 Date 객체로 변환하여 비교
+      sorted.sort((a, b) => new Date(b.date) - new Date(a.date));
+    } else if (sortType === "popular") {
+      // likes 필드를 기준으로 내림차순 정렬
+      sorted.sort((a, b) => b.likes - a.likes);
     }
     setFilteredItems(sorted);
     setCurrentPage(1); // 정렬 변경 시 1페이지로
@@ -86,9 +90,10 @@ const AniList = () => {
               <Link to={`/detail/${item.id}`}>
                 <div className="relative aspect-[3/4.2] overflow-hidden">
                   <img 
-                    src={item.imgUrl}
+                    src={item.imageUrl || 'https://anipingapp-imagestorege.s3.ap-northeast-2.amazonaws.com/aniCha/ai.png'} // imageUrl 사용 및 기본 이미지 설정
                     alt={item.title} 
                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
+                    onError={(e) => { e.target.src = 'https://anipingapp-imagestorege.s3.ap-northeast-2.amazonaws.com/aniCha/ai.png'; }} // 에러 발생 시 기본 이미지 설정
                   />
                   <div className="absolute top-4 left-4 glass-panel px-3 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-black text-primary shadow-sm">
                     <Star size={12} fill="currentColor" />
