@@ -23,6 +23,7 @@ public class AdAniDto {
     private Integer viewCount;
     private Integer likes;
     private String categoryName;
+    private String imageUrl; // 이미지 URL 필드 추가
 
     public static AdAniDto fromEntity(AdAniEntity entity) {
         return AdAniDto.builder()

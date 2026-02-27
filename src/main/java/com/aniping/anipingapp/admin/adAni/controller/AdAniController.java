@@ -1,13 +1,13 @@
 package com.aniping.anipingapp.admin.adAni.controller;
 
 import com.aniping.anipingapp.admin.adAni.dto.AdAniDto;
-import com.aniping.anipingapp.admin.adAni.entity.AdAniEntity;
 import com.aniping.anipingapp.admin.adAni.service.AdAniService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/AdminAni")
@@ -16,10 +16,10 @@ public class AdAniController {
 
     private final AdAniService adAniService;
 
-    //전체조회
+    //전체조회 (페이징 적용)
     @GetMapping
-    public ResponseEntity<List<AdAniDto>> getAllAnis() {
-        List<AdAniDto> dtos = adAniService.findAllAnis();
+    public ResponseEntity<Page<AdAniDto>> getAllAnis(@PageableDefault(size = 10) Pageable pageable) {
+        Page<AdAniDto> dtos = adAniService.findAllAnis(pageable);
         return ResponseEntity.ok(dtos);
     }
 
@@ -48,6 +48,4 @@ public class AdAniController {
         adAniService.deleteAni(id);
         return ResponseEntity.ok().build();
     }
-
-
 }

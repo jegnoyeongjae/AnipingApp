@@ -13,13 +13,13 @@ public interface adChaRepository extends JpaRepository<adChaEntity, Integer> {
     List<adChaEntity> findByAniId(Integer aniId);
 
     @Query("SELECT c FROM adChaEntity c " +
-           "LEFT JOIN c.user u " +
-           "LEFT JOIN c.animation a " +
-           "WHERE (:keyword IS NULL OR c.name LIKE %:keyword% OR u.nickname LIKE %:keyword% OR a.title LIKE %:keyword%) " +
-           "AND (:status IS NULL OR c.active = :status)")
+            "LEFT JOIN c.user u " +
+            "LEFT JOIN c.animation a " +
+            "WHERE (:keyword IS NULL OR c.name LIKE %:keyword% OR u.nickname LIKE %:keyword% OR a.title LIKE %:keyword%) " +
+            "AND (:status IS NULL OR c.active = :status)")
     Page<adChaEntity> findWithFilters(
-            @Param("keyword") String keyword, 
-            @Param("status") String status, 
+            @Param("keyword") String keyword,
+            @Param("status") String status,
             Pageable pageable
     );
 }

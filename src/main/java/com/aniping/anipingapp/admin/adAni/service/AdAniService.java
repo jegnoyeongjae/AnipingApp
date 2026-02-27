@@ -4,6 +4,8 @@ import com.aniping.anipingapp.admin.adAni.dto.AdAniDto;
 import com.aniping.anipingapp.admin.adAni.entity.AdAniEntity;
 import com.aniping.anipingapp.admin.adAni.repository.AdAniRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,19 +18,17 @@ public class AdAniService {
 
     private final AdAniRepository adAniRepository;
 
-    public List<AdAniDto> findAllAnis() {
-        List<AdAniEntity> entities = adAniRepository.findAllByDeleteAtIsNull();
+    public Page<AdAniDto> findAllAnis(Pageable pageable) {
+        Page<AdAniEntity> entities = adAniRepository.findAll(pageable);
 
-        return entities.stream()
-                .map(entity -> {
-                    AdAniDto dto = AdAniDto.fromEntity(entity);
+        return entities.map(entity -> {
+            AdAniDto dto = AdAniDto.fromEntity(entity);
 
-                    if (dto.getCategoryName() == null) {
-                        dto.setCategoryName("미지정");
-                    }
-                    return dto;
-                })
-                .toList();
+            if (dto.getCategoryName() == null) {
+                dto.setCategoryName("미지정");
+            }
+            return dto;
+        });
     }
 
     public AdAniDto getAniById(Integer id) {

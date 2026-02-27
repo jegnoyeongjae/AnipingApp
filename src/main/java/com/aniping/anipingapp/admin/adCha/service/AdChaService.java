@@ -119,8 +119,10 @@ public class AdChaService {
                     if (entity.getUser() != null) {
                         dto.setNickname(entity.getUser().getNickname());
                     }
-                    if (entity.getAnimation() != null) {
-                        dto.setAnimeTitle(entity.getAnimation().getTitle());
+                    // aniId로 직접 조회하여 안전하게 처리
+                    if (entity.getAniId() != null) {
+                        adAniRepo.findById(entity.getAniId())
+                                .ifPresent(ani -> dto.setAnimeTitle(ani.getTitle()));
                     }
                     return dto;
                 });
