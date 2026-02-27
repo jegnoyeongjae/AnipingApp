@@ -3,6 +3,9 @@ package com.aniping.anipingapp.admin.adAni.service;
 import com.aniping.anipingapp.admin.adAni.dto.AdAniDto;
 import com.aniping.anipingapp.admin.adAni.entity.AdAniEntity;
 import com.aniping.anipingapp.admin.adAni.repository.AdAniRepository;
+import com.aniping.anipingapp.global.constant.TargetType;
+import com.aniping.anipingapp.global.file.dto.FileResponseDto;
+import com.aniping.anipingapp.global.file.service.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +20,7 @@ import java.util.List;
 public class AdAniService {
 
     private final AdAniRepository adAniRepository;
+    private final FileService fileService; // FileService 주입
 
     public Page<AdAniDto> findAllAnis(Pageable pageable) {
         Page<AdAniEntity> entities = adAniRepository.findAll(pageable);
@@ -27,6 +31,12 @@ public class AdAniService {
             if (dto.getCategoryName() == null) {
                 dto.setCategoryName("미지정");
             }
+
+            // 이미지 URL 설정
+            List<FileResponseDto> files = fileService.getFilesByTarget(TargetType.ANILIST, entity.getId());
+            if (!files.isEmpty()) {
+                dto.setImageUrl(files.get(0).getFileUrl());
+            }
             return dto;
         });
     }
@@ -35,7 +45,15 @@ public class AdAniService {
         AdAniEntity entity = adAniRepository.findByIdAndDeleteAtIsNull(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 애니메이션이 없습니다."));
 
-        return AdAniDto.fromEntity(entity);
+        AdAniDto dto = AdAniDto.fromEntity(entity);
+
+        // 이미지 URL 설정
+        List<FileResponseDto> files = fileService.getFilesByTarget(TargetType.ANILIST, entity.getId());
+        if (!files.isEmpty()) {
+            dto.setImageUrl(files.get(0).getFileUrl());
+        }
+
+        return dto;
     }
 
     @Transactional

@@ -87,9 +87,10 @@ useEffect(() => {
                 <Link to={`/detail/${item.id}`}>
                   <div className="relative aspect-[3/4.2] overflow-hidden">
                     <img 
-                      src={'https://anipingapp-imagestorege.s3.ap-northeast-2.amazonaws.com/aniCha/ai.png'}
+                      src={item.imageUrl || 'https://anipingapp-imagestorege.s3.ap-northeast-2.amazonaws.com/aniCha/ai.png'}
                       alt={item.title} 
                       className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
+                      onError={(e) => { e.target.src = 'https://anipingapp-imagestorege.s3.ap-northeast-2.amazonaws.com/aniCha/ai.png'; }}
                     />
                     {/* 순위 배지 추가 */}
                       <div className="absolute top-4 right-4 bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center font-black text-sm shadow-lg">

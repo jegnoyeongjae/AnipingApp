@@ -58,7 +58,7 @@ public class SecurityConfig {
                                 "/api/user/check-id", 
                                 "/api/user/check-nickname",
                                 "/api/files/image/**",
-                                "/api/animeList/**",
+                                "/api/animeList**", // 수정된 부분
                                 "/api/oauth/join",
                                 "/api/cs/faq",
                                 "/api/email/**",

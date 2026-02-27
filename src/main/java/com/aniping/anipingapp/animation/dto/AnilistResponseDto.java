@@ -15,7 +15,7 @@ public class AnilistResponseDto {
     private String description;
     private LocalDate date;
     private String grade;
-    private String imgUrl;
+    private String imageUrl; // 필드명 변경
 
     public AnilistResponseDto(AdAniEntity anilist, String s3Key) {
         this.id = anilist.getId();
@@ -25,6 +25,6 @@ public class AnilistResponseDto {
         this.description = anilist.getDescription();
         this.date = anilist.getDate();
         this.grade = anilist.getGrade();
-        this.imgUrl = s3Key;
+        this.imageUrl = s3Key; // 필드명 변경
     }
 }
