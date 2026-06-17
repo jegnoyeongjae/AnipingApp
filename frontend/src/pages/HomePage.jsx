@@ -11,26 +11,46 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "./HomePage.css";
 
+
 const HomePage = () => {
-  const [items, setItems] = useState([]);
-    /*
-      useEffect(() => {
-        const fetchData = async () => {
-          try {
-            // 목 데이터는 프론트엔드 서버에서 가져오도록 별도 axios 인스턴스 사용
-            const localAxios = axios.create({
-                baseURL: 'http://localhost:5173'
-            });
-            const response = await localAxios.get('/data/animeData.json');
-            setItems(response.data);
-          } catch (error) {
-            console.error("Error fetching anime data:", error);
-          }
-        };
-        fetchData();
-      }, []);
-    */
-  const renderCategory = (category, title, icon) => (
+
+  // State 선언 추가!
+  const [fantasyItems, setFantasyItems] = useState([]);
+  const [romanceItems, setRomanceItems] = useState([]);
+  const [mysteryItems, setMysteryItems] = useState([]);
+  const [sfItems, setSfItems] = useState([]);
+  const [normalItems, setNormalItems] = useState([]);
+
+
+useEffect(() => {
+ const fetchAllCategories = async () => {
+     try {
+       // 1. 모든 카테고리 요청을 동시에 병렬로 실행합니다.
+       // API 주소는 백엔드 컨트롤러의 @GetMapping 구조에 맞게 설정하세요.
+       const [fantasyRes, romanceRes, sfRes, mysteryRes, normalRes] = await Promise.all([
+         axios.get(`http://localhost:8080/api/animeList?category=cat-1`),
+         axios.get(`http://localhost:8080/api/animeList?category=cat-15`),
+         axios.get(`http://localhost:8080/api/animeList?category=cat-5`),
+         axios.get(`http://localhost:8080/api/animeList?category=cat-4`),
+         axios.get(`http://localhost:8080/api/animeList?category=cat-12`)
+       ]);
+
+       // 2. 각각의 응답 데이터를 상태(State)에 저장합니다.
+       setFantasyItems(fantasyRes.data);
+       setRomanceItems(romanceRes.data);
+       setSfItems(sfRes.data);
+       setMysteryItems(mysteryRes.data);
+       setNormalItems(normalRes.data);
+
+     } catch (error) {
+       console.error("데이터 조회 실패:", error);
+     }
+   };
+
+   fetchAllCategories();
+}, []); // 빈 배열로 두어 컴포넌트 마운트 시 한 번만 실행
+
+  const renderCategory = (items, category, title, icon) => (
     <section className="my-32 px-6 md:px-12 relative">
       <div className="flex items-center justify-between mb-12">
         <div className="flex items-center gap-4">
@@ -60,18 +80,27 @@ const HomePage = () => {
         className="pb-12"
       >
         {items
-          .filter((item) => item.category === category)
           .slice(0, 10)
-          .map((item) => (
+          .map((item, index) => (
             <SwiperSlide key={item.id}>
               <div className="anime-card rounded-[2rem] overflow-hidden border border-blue-50/50 group">
                 <Link to={`/detail/${item.id}`}>
                   <div className="relative aspect-[3/4.2] overflow-hidden">
                     <img 
-                      src={item.img} 
+                      src={item.imageUrl || 'https://anipingapp-imagestorege.s3.ap-northeast-2.amazonaws.com/aniCha/ai.png'}
                       alt={item.title} 
                       className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
+                      onError={(e) => { e.target.src = 'https://anipingapp-imagestorege.s3.ap-northeast-2.amazonaws.com/aniCha/ai.png'; }}
                     />
+                    {/* 순위 배지 추가 */}
+                      <div className="absolute top-4 right-4 bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center font-black text-sm shadow-lg">
+                        {index + 1}
+                      </div>
+                    {/* 좋아요 표시 */}
+                      <div className="absolute top-4 left-4 glass-panel px-3 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-black text-primary shadow-sm">
+                        <Star size={12} fill="currentColor" />
+                        {item.likes || 0}
+                      </div>
                     <div className="absolute top-4 left-4 glass-panel px-3 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-black text-primary shadow-sm">
                       <Star size={12} fill="currentColor" />
                       {/* Mock score, as it's not in the new data */}
@@ -151,11 +180,11 @@ const HomePage = () => {
         </section>
 
         <div className="max-w-[1440px] mx-auto">
-          {renderCategory("fantasy", "Epic Fantasy", <Sparkles className="text-purple-400 fill-purple-400" size={20} />)}
-          {renderCategory("romance", "Youthful Romance", <Zap className="text-pink-400 fill-pink-400" size={20} />)}
-          {renderCategory("mystery", "Crime & Mystery", <Wind className="text-teal-400" size={20} />)}
-          {renderCategory("sf", "Sci-Fi & Future", <Zap className="text-cyan-400 fill-cyan-400" size={20} />)}
-          {renderCategory("normal", "Slice of Life", <Sparkles className="text-orange-400 fill-orange-400" size={20} />)}
+          {renderCategory(fantasyItems, "fantasy", "Epic Fantasy", <Sparkles className="text-purple-400 fill-purple-400" size={20} />)}
+          {renderCategory(romanceItems, "romance", "Youthful Romance", <Zap className="text-pink-400 fill-pink-400" size={20} />)}
+          {renderCategory(mysteryItems, "mystery", "Crime & Mystery", <Wind className="text-teal-400" size={20} />)}
+          {renderCategory(sfItems, "sf", "Sci-Fi & Future", <Zap className="text-cyan-400 fill-cyan-400" size={20} />)}
+          {renderCategory(normalItems, "normal", "Slice of Life", <Sparkles className="text-orange-400 fill-orange-400" size={20} />)}
 
           {/* Ad Section Re-imagined */}
           <section className="my-32 px-6 md:px-12">

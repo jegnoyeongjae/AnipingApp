@@ -47,7 +47,7 @@ public class AdNoticeEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
-    private BoardType boardType = BoardType.notification;
+    private BoardType boardType = BoardType.NOTIFICATION;
 
     public void updateNotice(String title, String content) {
         this.title = title;
@@ -59,8 +59,8 @@ public class AdNoticeEntity {
     }
 
     public enum BoardType {
-        notification,
-        freeboard
+        NOTIFICATION,
+        FREEBOARD
     }
 
     @Builder
@@ -68,6 +68,6 @@ public class AdNoticeEntity {
         this.title = title;
         this.content = content;
         this.user = user;
-        this.boardType = boardType != null ? boardType : BoardType.notification;
+        this.boardType = boardType != null ? boardType : BoardType.NOTIFICATION;
     }
 }

@@ -1,12 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import {useParams} from "react-router-dom";
+import axios from "axios";
 import "./AniDetail.css";
 import { AniCha, AniComment, AniInfo, AniPv, AniTag } from "../../components/anime";
 import Comment from "../../components/common/comment"; // Comment 컴포넌트 import
 
 const AniDetail = () => {
+    const {id} = useParams();
   // 1. 댓글 상태와 입력값을 관리하는 state를 추가합니다.
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState("");
+  const [aniDetail, setAniDetail] = useState({});
+
+useEffect(() => {
+    // id가 있을 때만 실행되도록 방어 코드 추가
+    if (!id) return;
+
+    axios.get(`http://localhost:8080/api/animeList/${id}`)
+        .then((res) => {
+            console.log("조회 성공:", res.data);
+            setAniDetail(res.data);
+        })
+        .catch((err) => {
+            console.error("애니 상세정보 조회 실패:", err);
+        });
+}, [id]); // id가 변경될 때마다 데이터를 다시 불러옴
 
   // 2. 댓글 추가 함수를 정의합니다.
   const onAddComment = (e) => {
@@ -43,7 +61,7 @@ const AniDetail = () => {
   return (
     <div className="ani-detail-container">
       <div className="ani-section-card">
-        <AniInfo />
+        <AniInfo data={aniDetail}/>
       </div>
       
       <div className="ani-section-card">
@@ -53,7 +71,7 @@ const AniDetail = () => {
 
       <div className="ani-section-card">
         <h3 className="ani-detail-title">PV / 예고편</h3>
-        <AniPv />
+        <AniPv data={aniDetail}/>
       </div>
 
       <div className="ani-section-card">

@@ -18,4 +18,8 @@ public interface AdTagsRepository extends JpaRepository<AdTagsEntity, Integer> {
     Optional<AdTagsEntity> findFirstBySequenceLessThanOrderBySequenceDesc(int sequence);
 
     Optional<AdTagsEntity> findFirstBySequenceGreaterThanOrderBySequenceAsc(int sequence);
+
+    @Modifying
+    @Query("UPDATE AdTagsEntity a SET a.sequence = a.sequence - 1 WHERE a.sequence > :deletedSequence")
+    void reorderSequenceAfterDelete(@Param("deletedSequence") int deletedSequence);
 }

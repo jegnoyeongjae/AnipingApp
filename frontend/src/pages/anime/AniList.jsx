@@ -2,6 +2,7 @@ import { Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Paging } from "../../components/common/Paging";
 import { Star } from "lucide-react";
+import axios from "axios";
 
 const AniList = () => {
   const { category } = useParams();
@@ -19,31 +20,37 @@ const AniList = () => {
     sf: "SF",
     normal: "일상",
   };
-
+  console.log(category);
   useEffect(() => {
-    fetch("/data/animeData.json")
-      .then((res) => res.json())
-      .then((data) => {
-        const categoryItems = data.filter((item) => item.category === category);
-        setAllItems(categoryItems);
-        setFilteredItems(categoryItems);
+    const orderParam = sortType === "popular" ? "likes" : "";
+    axios.get(`http://localhost:8080/api/animeList`,{
+        params: {
+              category: category, // 'fantasy' 등
+             // order: orderParam,   // 'likes' 또는 'latest'
+            }})
+      .then((res) => {
+          const data = res.data || [];
+          console.log(data);
+        setAllItems(data);
+        setFilteredItems(data);
       })
-      .catch((err) => console.error("JSON 불러오기 실패:", err));
-  }, [category]);
+      .catch((err) => console.error("애니 목록 조회실패:", err));
+  }, [category, sortType]);
 
   useEffect(() => {
     let sorted = [...allItems];
     if (sortType === "latest") {
-      sorted.sort((a, b) => b.id - a.id);
+      // date 필드가 LocalDate 타입이므로, 문자열로 비교하거나 Date 객체로 변환하여 비교
+      sorted.sort((a, b) => new Date(b.date) - new Date(a.date));
     } else if (sortType === "popular") {
-      // 'score'가 없으므로 임의의 인기도(likes)를 만들어 정렬하거나, id 역순으로 정렬
-      sorted.sort((a, b) => a.id - b.id); 
+      // likes 필드를 기준으로 내림차순 정렬
+      sorted.sort((a, b) => b.likes - a.likes);
     }
     setFilteredItems(sorted);
     setCurrentPage(1); // 정렬 변경 시 1페이지로
   }, [sortType, allItems]);
 
-  // Pagination Logic
+//   Pagination Logic
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
@@ -83,13 +90,14 @@ const AniList = () => {
               <Link to={`/detail/${item.id}`}>
                 <div className="relative aspect-[3/4.2] overflow-hidden">
                   <img 
-                    src={item.img} 
+                    src={item.imageUrl || 'https://anipingapp-imagestorege.s3.ap-northeast-2.amazonaws.com/aniCha/ai.png'} // imageUrl 사용 및 기본 이미지 설정
                     alt={item.title} 
                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
+                    onError={(e) => { e.target.src = 'https://anipingapp-imagestorege.s3.ap-northeast-2.amazonaws.com/aniCha/ai.png'; }} // 에러 발생 시 기본 이미지 설정
                   />
                   <div className="absolute top-4 left-4 glass-panel px-3 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-black text-primary shadow-sm">
                     <Star size={12} fill="currentColor" />
-                    {item.score || "N/A"}
+                    {item.score || "0.0"}
                   </div>
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
                     <div className="px-6 py-3 bg-white/90 backdrop-blur-md rounded-full shadow-2xl scale-50 group-hover:scale-100 transition-transform duration-300">

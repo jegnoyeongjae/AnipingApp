@@ -43,10 +43,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/board/**").permitAll()
+                        // Preflight 요청 허용
+                        //.requestMatchers(HttpMethod.OPTIONS, "/**").hasRole("admin")
                         .requestMatchers(
                                 "/",
                                 "/index.html",
-                                "/assets/**", 
+                                "/error",
+                                "/assets/**",
                                 "/images/**",
                                 "/data/**",
                                 "/favicon.ico",
@@ -55,12 +58,13 @@ public class SecurityConfig {
                                 "/api/user/check-id", 
                                 "/api/user/check-nickname",
                                 "/api/files/image/**",
-                                "/api/oauth/join", 
+                                "/api/animeList**", // 수정된 부분
+                                "/api/oauth/join",
                                 "/api/cs/faq",
                                 "/api/email/**",
                                 "/api/header/categories" // 카테고리 조회 API 허용
                         ).permitAll()
-                        .requestMatchers("/api/admin/**", "/api/AdUserLi/**", "/api/AdCuSeAsk/**", "/api/AdFAQ/**", "/api/AdminAni/**", "/api/AdminAniLiEd/**", "/api/AdminNotice/**","/api/AdminAni/tag/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**", "/api/AdUserLi/**", "/api/AdCuSeAsk/**", "/api/AdFAQ/**", "/api/AdminAni/**", "/api/AdminAniLiEd/**", "/api/AdminNotice/**","/api/AdminAni/tag/**", "/api/AdminChaBoard/**","/api/AdminChaFL/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 
@@ -103,6 +107,7 @@ public class SecurityConfig {
         configuration.setAllowedHeaders(Collections.singletonList("*"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
+
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

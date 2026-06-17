@@ -94,33 +94,26 @@ const AdminNotice = () => {
         }
     };
 
-    const handleSave = async () => {
-        const currentUserId = userInfo?.id || userInfo?.userId;
 
+    const handleSave = async () => {
         if (!editForm.title.trim() || !editForm.content.trim()) {
             alert('제목과 내용을 모두 입력해주세요.');
             return;
         }
 
-        if (!currentUserId) {
-            alert('사용자 정보를 찾을 수 없습니다. 다시 로그인해 주세요.');
-            return;
-        }
-
         try {
-            const dataParams = {
-                title: editForm.title,
-                content: editForm.content
-            };
-
             if (isEditing === 'new') {
-            await axios.post(`/api/AdminNotice/create`, null, {
-                params: { ...dataParams, userId: currentUserId }
-            });
-            alert('공지사항이 등록되었습니다.');
+                // 등록
+                await axios.post(`/api/AdminNotice/`, {
+                    title: editForm.title,
+                    content: editForm.content
+                });
+                alert('공지사항이 등록되었습니다.');
             } else {
-                await axios.put(`/api/AdminNotice/${isEditing}`, null, {
-                    params: dataParams
+                // 수정
+                await axios.put(`/api/AdminNotice/${isEditing}`, {
+                    title: editForm.title,
+                    content: editForm.content
                 });
                 alert('수정되었습니다.');
             }

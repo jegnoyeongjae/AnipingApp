@@ -25,31 +25,43 @@ const AdminAniEdit = () => {
     const [mainImage, setMainImage] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
     const [characters, setCharacters] = useState([]); // 캐릭터 상태를 여기서 관리
+    const [deletedCharIds, setDeletedCharIds] = useState([]);
 
     useEffect(() => {
-        // 카테고리 목록 로드
-        setCategories([
-            { id: 1, name: '판타지' },
-            { id: 2, name: '액션' },
-            { id: 3, name: '로맨스' },
-            { id: 4, name: '일상' },
-        ]);
+        axios.get('/api/AdminAni/tag')
+        .then(res => {
+            console.log("카테고리 로드 성공:", res.data);
+            setCategories(res.data);
+        })
+        .catch(err => {
+            console.error("카테고리 목록 로딩 실패:", err);
+            setCategories([
+                { id: 1, name: '로드 실패' },
+            ]);
+        });
 
         if (isEditing) {
-            // 애니메이션 정보 로드
-            // axios.get(`/api/admin/anilist/${id}`).then(res => setFormData(res.data));
-            
-            // 이미지 정보 로드
-            axios.get(`/api/files?targetType=ANILIST&targetId=${id}`)
+            // 애니메이션
+            axios.get(`/api/AdminAni/${id}`).then(res => setFormData(res.data));
+
+            // 이미지
+            axios.get(`/api/files`, {
+                params: { targetType: 'ANILIST', targetId: id }
+            })
                 .then(res => {
                     if (res.data && res.data.length > 0) {
-                        setMainImage(res.data[0]);
+                        // 백엔드에서 준 파일 경로(URL)를 미리보기 state에 저장
+                        setPreviewUrl(res.data[0].fileUrl);
                     }
+                });
+
+            //캐릭터
+            axios.get(`/api/AdminChaBoard/ani/${id}`)
+                .then(res => {
+                    console.log("불러온 캐릭터 목록:", res.data);
+                    setCharacters(res.data);
                 })
-                .catch(err => console.error("이미지 로드 실패:", err));
-            
-            // 캐릭터 정보 로드
-            // axios.get(`/api/admin/anilist/${id}/characters`).then(res => setCharacters(res.data));
+                .catch(err => console.error("캐릭터 목록 로딩 실패:", err));
         }
     }, [id, isEditing]);
 
@@ -63,24 +75,19 @@ const AdminAniEdit = () => {
         if (file) {
             const url = URL.createObjectURL(file);
             setPreviewUrl(url);
-            setMainImage({ file: file }); 
+            setMainImage(file);
         }
     };
 
     const handleImageRemove = () => {
-        if (isEditing && mainImage && mainImage.id) {
-            if (window.confirm("이미지를 삭제하시겠습니까?")) {
-                axios.delete(`/api/files/${mainImage.id}`)
-                    .then(() => {
-                        setMainImage(null);
-                        setPreviewUrl(null);
-                        alert("이미지가 삭제되었습니다.");
-                    })
-                    .catch(err => alert("이미지 삭제 실패"));
-            }
-        } else {
-            setMainImage(null);
-            setPreviewUrl(null);
+        setMainImage(null);
+        setPreviewUrl(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+    };
+
+    const handleDeleteCharacter = (id) => {
+        if (id) {
+            setDeletedCharIds(prev => [...prev, id]);
         }
     };
 
@@ -88,54 +95,67 @@ const AdminAniEdit = () => {
         e.preventDefault();
         
         try {
-            // 1. 애니메이션 정보 저장/수정
-            let aniId = id;
+            let targetId = id;
             if (isEditing) {
-                // await axios.put(`/api/admin/anilist/${id}`, formData);
-                alert("수정되었습니다. (API 호출 생략)");
+                await axios.put(`/api/AdminAni/${id}`, formData);
             } else {
-                // const res = await axios.post('/api/admin/anilist', formData);
-                // aniId = res.data.id;
-                aniId = Date.now(); // 임시 ID
-                alert("등록되었습니다. (API 호출 생략)");
+                const response = await axios.post('/api/AdminAni', formData);
+                targetId = response.data.id; // DB에서 자동 생성된 ID (Primary Key)
             }
 
-            // 2. 메인 이미지 업로드
-            if (mainImage && mainImage.file) {
-                const uploadFormData = new FormData();
-                uploadFormData.append('targetType', 'ANILIST');
-                uploadFormData.append('targetId', aniId);
-                uploadFormData.append('files', mainImage.file);
-                // await axios.post('/api/files/upload', uploadFormData);
+            //메인 이미지
+            if (mainImage && mainImage instanceof File) {
+                const imageFormData = new FormData();
+
+                imageFormData.append('targetType', 'ANILIST');
+                imageFormData.append('targetId', targetId);
+                imageFormData.append('files', mainImage);
+
+                await axios.post('/api/files/upload', imageFormData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
             }
 
-            // 3. 캐릭터 정보 및 이미지 저장
+            // 캐릭터
+            if (deletedCharIds.length > 0) {
+                for (const deleteId of deletedCharIds) {
+                    await axios.delete(`/api/AdminChaBoard/${deleteId}`);
+                }
+                console.log("삭제 완료된 ID들:", deletedCharIds);
+            }
+
             for (const char of characters) {
-                const charFormData = { aniId, name: char.name, cvId: char.cvId };
-                let charId = char.id;
+                const charRes = await axios.post('/api/AdminChaBoard', {
+                    id: char.id || null,
+                    aniId: targetId,
+                    name: char.name,
+                    cvId: char.cvId || 1
+                });
 
-                if (char.isNew) {
-                    // const res = await axios.post('/api/admin/characters', charFormData);
-                    // charId = res.data.id;
-                    console.log("신규 캐릭터 저장:", charFormData);
-                } else {
-                    // await axios.put(`/api/admin/characters/${char.id}`, charFormData);
-                    console.log("기존 캐릭터 수정:", charFormData);
-                }
+                const savedCharId = charRes.data.id;
 
-                if (char.image) {
-                    const charImageFormData = new FormData();
-                    charImageFormData.append('targetType', 'CHARACTER');
-                    charImageFormData.append('targetId', charId);
-                    charImageFormData.append('files', char.image);
-                    // await axios.post('/api/files/upload', charImageFormData);
+                if (char.image instanceof File) {
+                    const fileFormData = new FormData();
+                    fileFormData.append('targetType', 'CHARACTER');
+                    fileFormData.append('targetId', savedCharId);
+                    fileFormData.append('files', char.image);
+
+                    await axios.post('/api/files/upload', fileFormData, {
+                        headers: { 'Content-Type': 'multipart/form-data' }
+                    });
                 }
             }
 
+            alert(isEditing ? "수정되었습니다." : "등록되었습니다.");
             navigate('/AdminAni');
+
         } catch (error) {
             console.error("저장 실패:", error);
-            alert("저장 중 오류가 발생했습니다.");
+            // 에러 메시지 처리 강화
+            const errorMessage = error.response?.data || error.message || "저장 중 오류가 발생했습니다.";
+            alert(`저장 실패: ${errorMessage}`);
         }
     };
 
@@ -225,10 +245,10 @@ const AdminAniEdit = () => {
                         <div>
                             <label className={labelClass}>시청 등급</label>
                             <select name="grade" value={formData.grade} onChange={handleChange} className={inputClass}>
-                                <option value="all">전체 관람가</option>
-                                <option value="12">12세 관람가</option>
-                                <option value="15">15세 관람가</option>
-                                <option value="19">19세 관람가</option>
+                                <option value="ALL">전체 관람가</option>
+                                <option value="G12">12세 관람가</option>
+                                <option value="G15">15세 관람가</option>
+                                <option value="G19">19세 관람가</option>
                             </select>
                         </div>
 
@@ -261,7 +281,7 @@ const AdminAniEdit = () => {
                 </div>
                 
                 {/* 캐릭터 관리 컴포넌트 */}
-                <AdminAniCha characters={characters} setCharacters={setCharacters} />
+                <AdminAniCha characters={characters} setCharacters={setCharacters} onDelete={handleDeleteCharacter} />
 
                 <div className="flex justify-end pt-6">
                     <button type="submit" className="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-lg font-bold shadow hover:shadow-lg hover:-translate-y-0.5 transition-all">

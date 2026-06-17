@@ -10,28 +10,18 @@ const AdminAniLiEd = () => {
 
     useEffect(() => {
         const loadData = async () => {
-            // 1. 로컬 스토리지에서 데이터 확인
-            const storedAnis = localStorage.getItem('admin_anis');
-            let anis = [];
-            
-            if (storedAnis) {
-                anis = JSON.parse(storedAnis);
-            } else {
-                // 2. 없으면 JSON 파일에서 로드
-                try {
-                    const response = await axios.get('/data/animeInfoData.json');
-                    anis = response.data;
-                    localStorage.setItem('admin_anis', JSON.stringify(anis));
-                } catch (e) {
-                    console.error(e);
-                }
+            try {
+                // 💡 로컬 스토리지가 아니라 백엔드 API에서 1건의 데이터만 가져옵니다.
+                // 백엔드 컨트롤러에 @GetMapping("/{id}")가 있어야 합니다.
+                const response = await axios.get(`/api/AdminAni/${id}`);
+                setThisAni(response.data);
+            } catch (e) {
+                console.error("데이터 로드 실패:", e);
+                alert("정보를 불러올 수 없습니다.");
             }
-
-            const data = anis.find(item => item.id === Number(id));
-            setThisAni(data);
         };
         loadData();
-    }, [id])
+    }, [id]);
 
     if (!thisAni) {
         return (
@@ -85,16 +75,16 @@ const AdminAniLiEd = () => {
                             </div>
                             <div className="flex items-center">
                                 <strong className="w-24 text-slate-500 font-semibold">장르</strong>
-                                <span className="text-slate-700">{thisAni.genre}</span>
+                                <span className="text-slate-700">{thisAni.cateId}</span>
                             </div>
                             <div className="flex items-center">
                                 <strong className="w-24 text-slate-500 font-semibold">방영일</strong>
-                                <span className="text-slate-700">{thisAni.airDate}</span>
+                                <span className="text-slate-700">{thisAni.date}</span>
                             </div>
                             <div className="flex items-center">
                                 <strong className="w-24 text-slate-500 font-semibold">연령</strong>
                                 <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-800">
-                                    {thisAni.rating}
+                                    {thisAni.grade}
                                 </span>
                             </div>
                         </div>

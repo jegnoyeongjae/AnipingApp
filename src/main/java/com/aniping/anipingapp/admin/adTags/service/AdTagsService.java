@@ -28,10 +28,13 @@ public class AdTagsService {
     //삭제
     @Transactional
     public void deleteById(int id){
-        if(!adTagsRepository.existsById(id)){
-            throw new IllegalArgumentException("해당 태그가 존재하지 않습니다. id=" + id);
-        }
-        adTagsRepository.deleteById(id);
+        AdTagsEntity tagToDelete = adTagsRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 태그가 존재하지 않습니다. id=" + id));
+        
+        int deletedSequence = tagToDelete.getSequence();
+
+        adTagsRepository.delete(tagToDelete);
+        adTagsRepository.reorderSequenceAfterDelete(deletedSequence);
     }
 
     //추가
